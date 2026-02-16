@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -14,10 +14,11 @@ export class AutocompleteComponent {
 
   @Input() lista: any[] = [];
   @Input() placeholder: string = '';
-  @Input() label: string = '';
-  @Input() campoDescricao: string = 'descricao'; // 🔥 NOVO
+  @Input() campoDescricao: string = 'descricao';
 
   @Output() selecionado = new EventEmitter<any>();
+
+  @ViewChild('inputRef') inputRef!: ElementRef<HTMLInputElement>;
 
   textoBusca = '';
   listaFiltrada: any[] = [];
@@ -36,8 +37,18 @@ export class AutocompleteComponent {
     );
   }
 
+  abrirDropdown() {
+    this.aberto = true;
+    this.listaFiltrada = [...this.lista];
+
+    setTimeout(() => {
+      this.inputRef?.nativeElement.focus();
+    });
+  }
+
   filtrar() {
     const termo = (this.textoBusca || '').toLowerCase();
+
     this.aberto = true;
 
     if (!termo) {
@@ -63,7 +74,9 @@ export class AutocompleteComponent {
     this.selecionado.emit(null);
   }
 
-  fechar() {
-    this.aberto = false;
+  fecharComDelay() {
+    setTimeout(() => {
+      this.aberto = false;
+    }, 150);
   }
 }

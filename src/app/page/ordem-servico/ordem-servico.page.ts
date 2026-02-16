@@ -1,23 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { PopoverController } from '@ionic/angular';
+import { IonicModule, PopoverController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 
 import { OrdemServicoService } from '../../services/ordem-servico.service';
 import { CalendarPopoverComponent } from '../../components/calendar-popover/calendar-popover.component';
-import { AutocompleteComponent } from '../../components/autocomplete/autocomplete.component';
 
 @Component({
   selector: 'app-ordem-servico',
   templateUrl: './ordem-servico.page.html',
   styleUrls: ['./ordem-servico.page.scss'],
- standalone: false // ← IMPORTANTE
+  standalone: false
 })
 export class OrdemServicoPage implements OnInit {
 
+  // 🔹 FILTRO
   filtro = {
     numeroOs: '',
     empreendimento: '',
@@ -33,45 +30,86 @@ export class OrdemServicoPage implements OnInit {
 
   resultados: any[] = [];
 
-  // 🔹 LISTAS DO AUTOCOMPLETE (mesmas da edição)
+  // 🔹 LISTAS AUTOCOMPLETE
   equipamentosLista: any[] = [];
   empreendimentosLista: any[] = [];
   causasLista: any[] = [];
   manutentoresLista: any[] = [];
 
+  // 🔹 STATUS
+  statusLista = [
+    { valor: 1, descricao: 'Aberto' },
+    { valor: 2, descricao: 'Em andamento' },
+    { valor: 3, descricao: 'Concluído' },
+    { valor: 4, descricao: 'Cancelado' }
+  ];
+
+  // 🔹 CAMPOS DE DATA (USADO NO HTML)
+  camposData: {
+    key: 'dataAberturaInicial' |
+         'dataAberturaFinal' |
+         'dataConclusaoInicial' |
+         'dataConclusaoFinal',
+    label: string
+  }[] = [
+    { key: 'dataAberturaInicial',  label: 'Data Abertura Inicial' },
+    { key: 'dataAberturaFinal',    label: 'Data Abertura Final' },
+    { key: 'dataConclusaoInicial', label: 'Data Conclusão Inicial' },
+    { key: 'dataConclusaoFinal',   label: 'Data Conclusão Final' }
+  ];
+
   constructor(
     public router: Router,
     private popoverCtrl: PopoverController,
-    private ordemServicoService: OrdemServicoService
+    private ordemService: OrdemServicoService
   ) {}
 
-  // 🔹 Carrega listas ao abrir tela
- ngOnInit() {
-  this.ordemServicoService.listarEquipamentos().subscribe(r => this.equipamentosLista = r || []);
-  this.ordemServicoService.listarEmpreendimentos().subscribe(r => this.empreendimentosLista = r || []);
-  this.ordemServicoService.listarCausasIntervencao().subscribe(r => this.causasLista = r || []);
-  this.ordemServicoService.listarColaboradoresManutentores()
-  .subscribe(r => {
-    this.manutentoresLista = (r || []).map((m: any) => ({
-      id: m.id ?? m.colaboradorId ?? m.manutentorId,
-      descricao: m.descricao ?? m.nome ?? m.colaboradorNome
-    }));
-  });
+  // 🔹 INIT
+  ngOnInit() {
+    this.carregarCombos();
+  }
 
-}
+  // 🔹 CARREGAR COMBOS
+  private carregarCombos() {
 
+    this.ordemService.listarEmpreendimentos().subscribe({
+      next: (lista) => (this.empreendimentosLista = lista || [])
+    });
 
-  // Voltar para home de frotas
+    this.ordemService.listarEquipamentos().subscribe({
+      next: (lista) => (this.equipamentosLista = lista || [])
+    });
+
+    this.ordemService.listarCausasIntervencao().subscribe({
+      next: (lista) => (this.causasLista = lista || [])
+    });
+
+    this.ordemService.listarColaboradoresManutentores().subscribe({
+      next: (lista) => {
+        this.manutentoresLista = (lista || []).map((m: any) => ({
+          ...m,
+          id: String(
+            m.fornId ||
+            m.colaboradorId ||
+            m.id ||
+            m.colaboradorCod ||
+            ''
+          )
+        }));
+      }
+    });
+  }
+
+  // 🔹 NAVEGAÇÃO
   onBack() {
     this.router.navigate(['/tabs/frotas-home']);
   }
 
-  // Ir para tela de edição / nova OS
   goNovaOrdem() {
     this.router.navigate(['/tabs/ordem-servico-edicao']);
   }
 
-  // 🔹 Métodos chamados pelo autocomplete
+  // 🔹 AUTOCOMPLETE
   onEquipamentoSelecionado(item: any) {
     this.filtro.equipamento = item?.id || '';
   }
@@ -88,10 +126,17 @@ export class OrdemServicoPage implements OnInit {
     this.filtro.manutentor = item?.id || '';
   }
 
-  // Abrir calendário
+  onStatusSelecionado(item: any) {
+    this.filtro.status = item?.valor || '';
+  }
+
+  // 🔹 CALENDÁRIO
   async openCalendar(
     event: any,
-    field: 'dataAberturaInicial' | 'dataAberturaFinal' | 'dataConclusaoInicial' | 'dataConclusaoFinal'
+    field: 'dataAberturaInicial' |
+           'dataAberturaFinal' |
+           'dataConclusaoInicial' |
+           'dataConclusaoFinal'
   ) {
     const popover = await this.popoverCtrl.create({
       component: CalendarPopoverComponent,
@@ -104,11 +149,24 @@ export class OrdemServicoPage implements OnInit {
     await popover.present();
     const { data } = await popover.onDidDismiss();
 
-    if (data && data.date) {
+    if (data?.date) {
       this.filtro[field] = data.date;
     }
   }
 
+  // 🔹 LIMPAR DATA (ESSENCIAL PRO “X”)
+  clearDate(
+    field: 'dataAberturaInicial' |
+           'dataAberturaFinal' |
+           'dataConclusaoInicial' |
+           'dataConclusaoFinal',
+    event: Event
+  ) {
+    event.stopPropagation();
+    this.filtro[field] = '';
+  }
+
+  // 🔹 FORMATAR DATA
   formatDate(isoString: string): string {
     if (!isoString) return '';
     try {
@@ -118,21 +176,10 @@ export class OrdemServicoPage implements OnInit {
     }
   }
 
-  // Pesquisar → navega para tela de pesquisa com filtros
+  // 🔹 PESQUISAR
   pesquisar() {
     this.router.navigate(['/tabs/ordem-servico-pesquisa'], {
-      queryParams: {
-        numeroOs: this.filtro.numeroOs,
-        empreendimento: this.filtro.empreendimento,
-        equipamento: this.filtro.equipamento,
-        causaIntervencao: this.filtro.causaIntervencao,
-        manutentor: this.filtro.manutentor,
-        status: this.filtro.status,
-        dataAberturaInicial: this.filtro.dataAberturaInicial,
-        dataAberturaFinal: this.filtro.dataAberturaFinal,
-        dataConclusaoInicial: this.filtro.dataConclusaoInicial,
-        dataConclusaoFinal: this.filtro.dataConclusaoFinal,
-      }
+      queryParams: { ...this.filtro }
     });
   }
 }

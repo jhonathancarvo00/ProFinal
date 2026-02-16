@@ -279,7 +279,7 @@
             alt="Foto da OS"
             (click)="abrirFotoOverlay(i)"
           />
-          <div class="os-photo-hint">Toque em uma foto para ampliar</div>
+          <div class="os-photo-hint"></div>
         </div>
 
         <ng-template #semFoto>
@@ -314,36 +314,41 @@
   </div>
 
   <ion-modal
-    [isOpen]="fotoModalAberto"
-    (didDismiss)="fecharFotoOverlay()"
-    cssClass="os-foto-modal"
-  >
-    <ng-template>
-      <ion-content class="os-foto-modal-content">
-        <div class="os-foto-modal-header">
-          <button class="os-foto-modal-close" type="button" (click)="fecharFotoOverlay()">
-            FECHAR
-          </button>
-        </div>
+  [isOpen]="fotoModalAberto"
+  (didDismiss)="fecharFotoOverlay()"
+  cssClass="os-foto-modal"
+>
+  <ng-template>
+    <ion-content class="os-foto-modal-content">
 
-        <div class="os-foto-modal-body">
-          <img
-            class="os-foto-modal-img"
-            [src]="fotoPreviewDataUrl"
-            alt="Foto da OS"
-          />
-        </div>
+      <div class="os-foto-modal-card">
 
-        <div class="os-foto-modal-actions">
-          <button
-            class="os-foto-modal-delete"
-            type="button"
-            (click)="excluirFotoLocal()"
-          >
-            EXCLUIR FOTO
-          </button>
-        </div>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
-</ion-content>
+        <!-- IMAGEM -->
+        <img
+          class="os-foto-modal-img"
+          [src]="fotoPreviewDataUrl"
+          alt="Foto da OS"
+        />
+
+        <!-- BOTÕES -->
+        <button
+          class="os-primary-btn"
+          type="button"
+          (click)="fecharFotoOverlay()"
+        >
+          FECHAR
+        </button>
+
+        <button
+          class="os-secondary-btn"
+          type="button"
+          (click)="excluirFotoLocal()"
+        >
+          EXCLUIR FOTO
+        </button>
+
+      </div>
+
+    </ion-content>
+  </ng-template>
+</ion-modal>

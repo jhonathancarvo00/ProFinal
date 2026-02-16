@@ -1,190 +1,146 @@
 <ion-header class="os-header">
   <ion-toolbar lines="none">
     <div class="os-header-bar">
-      <!-- Ícone de voltar (casinha) -->
+
+      <!-- ícone voltar -->
       <button class="os-back-btn" (click)="onBack()">
         <img src="../../assets/icon/topoRequest.svg" alt="Voltar" />
       </button>
 
+      <!-- título -->
       <h1 class="os-title">Ordem de Serviço</h1>
 
-      <!-- Botão NOVA -->
-      <button class="os-new-btn" (click)="goNovaOrdem()" title="Ação">
+      <!-- botão NOVA -->
+      <button class="os-new-btn" (click)="goNovaOrdem()">
         NOVA
       </button>
+
     </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="os-content">
+
+<ion-content class="os-content">
   <div class="os-page">
+
     <div class="os-card">
-      <!-- Número OS -->
+
+      <!-- CAMPOS -->
       <div class="os-field">
         <label class="os-label">Número OS</label>
-        <ion-input
-          class="os-input"
-          type="text"
-          [(ngModel)]="filtro.numeroOs">
-        </ion-input>
+        <ion-input class="os-input" [(ngModel)]="filtro.numeroOs"></ion-input>
       </div>
 
-      <!-- Empreendimento -->
-       <div class="os-field">
-  <label class="os-label">Empreendimento</label>
+      <div class="os-field">
+        <label class="os-label">Empreendimento</label>
+        <app-autocomplete
+          [lista]="empreendimentosLista"
+          campoDescricao="descricao"
+          (selecionado)="onEmpreendimentoSelecionado($event)">
+        </app-autocomplete>
+      </div>
+
+      <div class="os-field">
+        <label class="os-label">Equipamento</label>
+        <app-autocomplete
+          [lista]="equipamentosLista"
+          campoDescricao="descricao"
+          (selecionado)="onEquipamentoSelecionado($event)">
+        </app-autocomplete>
+      </div>
+
+      <div class="os-field">
+        <label class="os-label">Causa Intervenção</label>
+        <app-autocomplete
+          [lista]="causasLista"
+          campoDescricao="descricao"
+          (selecionado)="onCausaSelecionada($event)">
+        </app-autocomplete>
+      </div>
+
+      <div class="os-field">
+        <label class="os-label">Manutentor</label>
+<app-autocomplete
+  [lista]="manutentoresLista"
+  placeholder=""
+  campoDescricao="colaboradorNome"
+  (selecionado)="onManutentorSelecionado($event)">
+</app-autocomplete>
+      </div>
+
+      <!-- Status -->
+<div class="os-field">
+  <label class="os-label">Status</label>
 
   <app-autocomplete
-    [lista]="empreendimentosLista"
+    [lista]="statusLista"
     placeholder=""
     campoDescricao="descricao"
-    (selecionado)="onEmpreendimentoSelecionado($event)">
+    (selecionado)="onStatusSelecionado($event)">
   </app-autocomplete>
 </div>
 
- 
+<!-- CAMPOS DE DATA -->
+<ng-container *ngFor="let c of camposData">
 
-      <!-- Equipamento -->
   <div class="os-field">
-  <label class="os-label">Equipamento</label>
+    <label class="os-label">{{ c.label }}</label>
 
-  <app-autocomplete
-    [lista]="equipamentosLista"
-    placeholder=""
-    campoDescricao="descricao"
-    (selecionado)="onEquipamentoSelecionado($event)">
-  </app-autocomplete>
-</div>
+    <div class="os-date-input">
 
-      <!-- Causa Intervenção -->
-<div class="os-field">
-  <label class="os-label">Causa Intervenção</label>
+      <!-- INPUT VISUAL -->
+      <ion-input
+        class="os-input os-date-display"
+        readonly
+        placeholder="dd/mm/aaaa"
+        [value]="formatDate(filtro[c.key])"
+        (click)="openCalendar($event, c.key)">
+      </ion-input>
 
-  <app-autocomplete
-    [lista]="causasLista"
-    placeholder=""
-    campoDescricao="descricao"
-    (selecionado)="onCausaSelecionada($event)">
-  </app-autocomplete>
-</div>
+      <!-- LIMPAR DATA -->
+      <button
+        *ngIf="filtro[c.key]"
+        type="button"
+        class="os-date-clear"
+        (click)="clearDate(c.key, $event)">
+        ✕
+      </button>
 
+      <!-- CALENDÁRIO -->
+      <button
+        type="button"
+        class="os-date-btn"
+        (click)="openCalendar($event, c.key)">
+        <ion-icon name="calendar-clear-outline"></ion-icon>
+      </button>
 
-      <!-- Manutentor -->
- <div class="os-field">
-  <label class="os-label">Manutentor</label>
-
-  <app-autocomplete
-    [lista]="manutentoresLista"
-    placeholder=""
-    campoDescricao="descricao"
-    (selecionado)="onManutentorSelecionado($event)">
-  </app-autocomplete>
-</div>
-
-        <!-- Data Abertura Inicial -->
-<div class="os-field">
-  <label class="os-label">Data Abertura Inicial</label>
-  <div class="os-date-input">
-    <ion-input
-      class="os-input os-date-display"
-      readonly
-      placeholder="dd/mm/aaaa"
-      [value]="formatDate(filtro.dataAberturaInicial)">
-    </ion-input>
-
-    <!-- ícone de calendário dentro do campo -->
-    <button
-      type="button"
-      class="os-date-btn"
-      (click)="openCalendar($event, 'dataAberturaInicial')" title="Ação">
-      <ion-icon name="calendar-clear-outline"></ion-icon>
-    </button>
+    </div>
   </div>
-</div>
 
-<!-- Data Abertura Final -->
-<div class="os-field">
-  <label class="os-label">Data Abertura Final</label>
-  <div class="os-date-input">
-    <ion-input
-      class="os-input os-date-display"
-      readonly
-      placeholder="dd/mm/aaaa"
-      [value]="formatDate(filtro.dataAberturaFinal)">
-    </ion-input>
-
-    <button
-      type="button"
-      class="os-date-btn"
-      (click)="openCalendar($event, 'dataAberturaFinal')" title="Ação">
-      <ion-icon name="calendar-clear-outline"></ion-icon>
-    </button>
-  </div>
-</div>
-
-<!-- Data Conclusão Inicial -->
-<div class="os-field">
-  <label class="os-label">Data Conclusão Inicial</label>
-  <div class="os-date-input">
-    <ion-input
-      class="os-input os-date-display"
-      readonly
-      placeholder="dd/mm/aaaa"
-      [value]="formatDate(filtro.dataConclusaoInicial)">
-    </ion-input>
-
-    <button
-      type="button"
-      class="os-date-btn"
-      (click)="openCalendar($event, 'dataConclusaoInicial')" title="Ação">
-      <ion-icon name="calendar-clear-outline"></ion-icon>
-    </button>
-  </div>
-</div>
-
-<!-- Data Conclusão Final -->
-<div class="os-field">
-  <label class="os-label">Data Conclusão Final</label>
-  <div class="os-date-input">
-    <ion-input
-      class="os-input os-date-display"
-      readonly
-      placeholder="dd/mm/aaaa"
-      [value]="formatDate(filtro.dataConclusaoFinal)">
-    </ion-input>
-
-    <button
-      type="button"
-      class="os-date-btn"
-      (click)="openCalendar($event, 'dataConclusaoFinal')" title="Ação">
-      <ion-icon name="calendar-clear-outline"></ion-icon>
-    </button>
-  </div>
-</div>
+</ng-container>
 
 
-      <!-- Botão Pesquisar -->
+
+      <!-- BOTÃO -->
       <div class="os-actions">
-        <ion-button
-          expand="block"
-          class="os-search-btn"
-          (click)="pesquisar()">
+        <ion-button expand="block" class="os-search-btn" (click)="pesquisar()">
           PESQUISAR
         </ion-button>
       </div>
-        <!-- Resultados da pesquisa -->
-        <div *ngIf="resultados.length > 0" class="os-resultados">
-          <h2>Resultados</h2>
-          <ion-list>
-            <ion-item *ngFor="let os of resultados">
-              <ion-label>
-                <div><strong>Número OS:</strong> {{ os.osCod }}</div>
-                <div><strong>Descrição:</strong> {{ os.osDescricao }}</div>
-                <div><strong>Equipamento:</strong> {{ os.equipCod }} - {{ os.equipIndentificador }}</div>
-                <!-- Adicione outros campos relevantes aqui -->
-              </ion-label>
-            </ion-item>
-          </ion-list>
+
+      <!-- RESULTADOS -->
+      <div *ngIf="resultados.length" class="os-resultados">
+
+        <h2 class="os-result-title">Resultados</h2>
+
+        <div class="os-result-card" *ngFor="let os of resultados">
+          <div><strong>Nº OS:</strong> {{ os.osCod }}</div>
+          <div><strong>Descrição:</strong> {{ os.osDescricao }}</div>
+          <div><strong>Equipamento:</strong> {{ os.equipCod }} - {{ os.equipIndentificador }}</div>
         </div>
+
+      </div>
+
     </div>
   </div>
 </ion-content>

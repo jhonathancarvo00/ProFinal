@@ -1362,9 +1362,6 @@ onDigitarStatus() {
     st.descricao.toLowerCase().includes(termo)
   );
 }
-
-
-
   /** Clicou na setinha – monta o JSON igual ao do sistema antigo e chama a API */
   salvarOS() {
     const oldOsId = this.osId;
@@ -1452,12 +1449,17 @@ if (faltando.length > 0) {
         // 🔧 ALTERAÇÃO: exibe popup automático de sucesso
         this.mostrarToastSucesso();
 
+        //NOVO: navegar automaticamente para a tela de pesquisa
+this.router.navigate(['/tabs/ordem-servico-pesquisa'], {//DEFINIR PARA QUAL TELA REALMENTE DEVERA VOLTAR 
+  replaceUrl: true
+});
+
         // 🔧 ALTERAÇÃO: libera botão Anexar Foto
         //this.osConfirmada = true;
       },
       error: async () => {
         // mesmo em erro, mantém o fluxo atual conforme solicitado
-        await this.mostrarToastSucesso();
+        await this.mostrarToastAviso('Erro ao salvar a OS');
         //this.osConfirmada = true;
 
         // Mesmo em erro, tenta atualizar o preview (pode ter voltado da tela de foto)
@@ -1477,18 +1479,6 @@ if (faltando.length > 0) {
     queryParams: { osId: this.osId, osCod: this.numeroOS, os: this.osId },
   });
 }
-
-
-
-
-  //AQUI ERA A ROT ANTIGA
-/*
-  private irParaDefeitos() {
-    this.router.navigate(['/tabs/ordem-servico-defeitos'], {
-      queryParams: { os: this.numeroOS },
-    });
-  }
-*/
   onMotoristaChange(event: any) {
     let guid = event.detail?.value;
     // Se não for um GUID, tenta buscar na lista

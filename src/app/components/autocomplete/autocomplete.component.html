@@ -1,16 +1,17 @@
-<div class="os-autocomplete">
+<div class="os-autocomplete" (click)="abrirDropdown()">
 
   <input
+    #inputRef
     type="text"
     class="os-input"
     [(ngModel)]="textoBusca"
-    (focus)="aberto = true"
+    (focus)="abrirDropdown()"
     (input)="filtrar()"
-    (blur)="fechar()"
+    (blur)="fecharComDelay()"
     [placeholder]="placeholder"
   />
 
-  <!-- BOTÃO X -->
+  <!-- BOTÃO LIMPAR -->
   <button
     *ngIf="textoBusca"
     class="clear-btn"

@@ -402,6 +402,11 @@ export class OrdemServicoNovaFotoPage {
   async localizarFoto() {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Selecionar foto',
+
+          // >>> ALTERAÇÃO 1 (VISUAL DO CARD)
+    cssClass: 'os-photo-sheet',
+    mode: 'ios',
+
       buttons: [
         {
           text: 'Câmera',

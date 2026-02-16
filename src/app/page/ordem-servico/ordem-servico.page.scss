@@ -1,25 +1,70 @@
-/* ===== FUNDO ===== */
-.os-content {
-  --background: #f4f6f9;
+/* ================= HEADER ================= */
+
+.os-header,
+.os-header ion-toolbar {
+  --background: #f4f6f9 !important;
+  background: #f4f6f9 !important;
+  color: #2d6fb1;
+  --border-width: 0;
 }
 
-/* ===== CARD ===== */
+/* barra interna */
+.os-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px 10px;
+}
+
+/* título */
+.os-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d6fb1;
+}
+
+/* botão voltar */
+.os-back-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.os-back-btn img {
+  width: 22px;
+}
+
+/* botão NOVA */
+.os-new-btn {
+  background: #e4f1ff;
+  color: #2d6fb1;
+  border: none;
+  border-radius: 14px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* CARD CENTRAL */
 .os-page {
   display: flex;
   justify-content: center;
-  padding: 12px;
+  padding: 14px;
 }
 
 .os-card {
   width: 100%;
   max-width: 420px;
   background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
   padding: 18px;
 }
 
-/* ===== CAMPOS ===== */
+/* CAMPOS */
 .os-field {
   margin-bottom: 14px;
 }
@@ -32,7 +77,7 @@
   display: block;
 }
 
-/* ===== INPUT PADRÃO ===== */
+/* INPUT */
 .os-input {
   --background: #ffffff;
   --padding-start: 12px;
@@ -43,6 +88,65 @@
   border-radius: 12px;
   font-size: 14px;
   color: #2c3e50;
+}
+
+.os-input.ion-focused {
+  border: 2px solid #000;
+}
+
+/* BOTÃO PESQUISAR */
+.os-actions {
+  margin-top: 20px;
+}
+
+.os-search-btn {
+  --background: linear-gradient(135deg, #4c8dff, #2d6fb1);
+  --border-radius: 24px;
+  --color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  height: 46px;
+}
+
+/* RESULTADOS */
+.os-resultados {
+  margin-top: 20px;
+}
+
+.os-result-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d6fb1;
+  margin-bottom: 10px;
+}
+
+.os-result-card {
+  background: #f8fbff;
+  border: 1px solid #e1e9f5;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+/* FUNDO IGUAL À TELA DE EDIÇÃO */
+ion-content.os-content {
+  --background: #f4f6f9 !important;
+  background: #f4f6f9 !important;
+}
+
+/* ===== DATA INPUT  ===== */
+
+/* ===== DATA INPUT ===== */
+
+.os-date-input {
+  position: relative;
+  width: 100%;
+}
+
+/* INPUT */
+.os-date-display {
+  --padding-end: 80px; /* espaço real para X + calendário */
+  cursor: pointer;
 
   /* remove azul ionic */
   --highlight-color-focused: transparent;
@@ -50,58 +154,64 @@
   --highlight-color-invalid: transparent;
 }
 
-/* foco preto igual edição */
-.os-input.ion-focused {
-  border: 2px solid #000;
+/* remove borda azul ao focar */
+.os-date-display.ion-focused {
+  border: 1px solid #dde5f2 !important;
+  box-shadow: none !important;
 }
 
-/* ===== AUTOCOMPLETE (SEM QUEBRAR COMPONENTE) ===== */
-/* só estiliza o container externo, sem mexer dentro */
-app-autocomplete {
-  display: block;
-  width: 100%;
+/* BOTÃO LIMPAR (X) */
+.os-date-clear {
+  position: absolute;
+  right: 44px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+
+  background: #eef2f8;
+  color: #6b7a99;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  z-index: 10; /* ← ESSENCIAL */
 }
 
-/* ===== DATAS ===== */
-.os-date-input {
-  position: relative;
+.os-date-clear:hover {
+  background: #dfe6f3;
 }
 
-.os-date-input .os-input {
-  width: 100%;
-  --padding-end: 40px;
-}
-
+/* BOTÃO CALENDÁRIO */
 .os-date-btn {
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
+
   width: 26px;
   height: 26px;
   border-radius: 6px;
   border: 1px solid #dde5f2;
   background: #f4f7ff;
+
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+
+  z-index: 10; /* ← ESSENCIAL */
 }
 
 .os-date-btn ion-icon {
   font-size: 16px;
   color: #a0b2cf;
-}
-
-/* ===== BOTÃO ===== */
-.os-actions {
-  margin-top: 18px;
-}
-
-.os-search-btn {
-  --background: #e4f1ff;
-  --border-radius: 22px;
-  --color: #2d6fb1;
-  font-weight: 600;
-  letter-spacing: 0.6px;
 }

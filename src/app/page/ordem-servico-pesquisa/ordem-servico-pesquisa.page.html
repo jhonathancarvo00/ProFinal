@@ -14,29 +14,47 @@
 
 <ion-content [fullscreen]="true" class="os-content">
   <div class="os-page">
+
     <!-- Lista de OS -->
     <ng-container *ngIf="listaOs?.length; else semResultado">
+
       <div class="os-card" *ngFor="let os of listaOs">
-        <div class="os-card-row">
-          <span class="os-card-label">N° OS:</span>
-          <span class="os-card-value">{{ os.osCod }}</span>
-          <span class="os-card-status">{{ os.statusDescricao }}</span>
+
+        <!-- HEADER DO CARD -->
+        <div class="os-card-header">
+          <div class="os-card-os">
+            N° OS: {{ os.osCod }}
+          </div>
+
+          <div class="os-card-status">
+            {{ os.statusDescricao }}
+          </div>
         </div>
-        <div class="os-card-row">
-          <span class="os-card-label">Descrição:</span>
-          <span class="os-card-value">{{ os.osDescricao }}</span>
+
+        <!-- CORPO -->
+        <div class="os-card-body">
+          <div class="os-line">
+            <span class="os-label">Descrição:</span>
+            <span class="os-value">{{ os.osDescricao }}</span>
+          </div>
+
+          <div class="os-line">
+            <span class="os-label">Equipamento:</span>
+            <span class="os-value">
+              {{ os.equipCod }} - {{ os.equipIndentificador }}
+            </span>
+          </div>
         </div>
-        <div class="os-card-row">
-          <span class="os-card-label">Equipamento:</span>
-          <span class="os-card-value">{{ os.equipCod }} - {{ os.equipIndentificador }}</span>
-        </div>
-        <!-- Adicione/remova outros campos conforme necessário -->
+
+        <!-- FOOTER -->
         <div class="os-card-footer">
           <button class="os-details-btn" (click)="verDetalhes(os)">
             VER DETALHES
           </button>
         </div>
+
       </div>
+
     </ng-container>
 
     <!-- Estado vazio -->
@@ -45,5 +63,6 @@
         <p>Nenhuma Ordem de Serviço encontrada.</p>
       </div>
     </ng-template>
+
   </div>
 </ion-content>
