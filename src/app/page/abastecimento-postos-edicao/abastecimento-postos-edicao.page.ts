@@ -6,6 +6,8 @@ import { forkJoin, of } from 'rxjs';
 import { CalendarPopoverComponent } from '../../components/calendar-popover/calendar-popover.component';
 import { AbastecimentoService } from '../../services/abastecimento.service';
 
+//import { AutocompleteComponent } from '../../components/autocomplete/autocomplete.component';
+
 type LookupId = string | number;
 type LookupItem = {
   id: LookupId;
@@ -45,7 +47,7 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
   total: number | null = null;
   hodometro: number | null = null;
   horimetro: number | null = null;
-  retorno: boolean = true;
+  retorno: boolean = false;
   estoque: boolean = false;
 
   // Listas para os selects
@@ -204,7 +206,7 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
     this.total = null;
     this.hodometro = null;
     this.horimetro = null;
-    this.retorno = true;
+    this.retorno = false;
     this.estoque = false;
 
     // listas dependentes
@@ -736,6 +738,13 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
       return '';
     }
   }
+  limparData(
+  campo: 'dtRetirada' | 'hodometroData' | 'nCtlPostoData',
+  event: Event
+) {
+  event.stopPropagation();
+  this[campo] = null;
+}
 
   confirmar() {
     if (!this.dtRetirada) {
@@ -749,6 +758,8 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
       alert('⚠️ Data inválida');
       return;
     }
+
+    
     const pad2 = (n: number) => n.toString().padStart(2, '0');
     const dataFormatada =
       `${d.getFullYear()}-` +
@@ -826,6 +837,9 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
     // Remover campos nulos ou indefinidos
     Object.keys(payload).forEach(key => (payload[key] === null || payload[key] === undefined) && delete payload[key]);
     // Chamar service para gravar
+
+console.log('PAYLOAD ENVIADO:', payload); 
+
     this.abastecimentoService.gravarAbastecimento(payload).subscribe({
       next: (res) => {
         this.mostrarToastSucesso('Abastecimento gravado com sucesso');

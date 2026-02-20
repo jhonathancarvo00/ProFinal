@@ -79,29 +79,35 @@
   color: #2d6fb1;
 }
 
-/* Input padrão com foco azul */
+/* ============================= */
+/* 🎯 INPUT PADRÃO DO SISTEMA */
+/* ============================= */
+
 .os-input {
-  --background: #f9fbff;
-  --padding-start: 10px;
-  --padding-end: 10px;
-  --min-height: 40px;
-  --color: #3a3a3a;
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
 
-  border-radius: 8px;
-  border: 1px solid #dde5f2;
-  font-size: 13px;
+  border: 1px solid #d6dbe1;
+  border-radius: 12px;
+  background: #ffffff;
 
-  --highlight-color-focused: #2d6fb1;
-  --highlight-color: #2d6fb1;
-  --highlight-color-valid: #2d6fb1;
-  --highlight-color-invalid: #2d6fb1;
+  font-size: 14px;
+  color: #2c3e50;
+
+  box-sizing: border-box;
+  outline: none;
+  transition: border 0.2s ease;
+  cursor: text;
 }
 
-.os-input.ion-focused {
-  border-color: #2d6fb1 !important;
+/* 🔥 Foco padrão (igual Descrição da OS) */
+.os-input:focus {
+  border: 2px solid #000000;
 }
-
-/* ------- CAMPOS DE DATA ------- */
+/* ============================= */
+/* 📅 CAMPO DE DATA PADRONIZADO */
+/* ============================= */
 
 .os-date-input {
   position: relative;
@@ -109,30 +115,35 @@
   align-items: center;
 }
 
-/* garante que o input fique “atrás” do botão */
-.os-date-input ion-input {
-  position: relative;
-  z-index: 1;
-}
-
+/* Input ocupa toda largura */
 .os-date-display {
   flex: 1;
 }
 
+/* Espaço interno para X + calendário */
 .os-date-input .os-input {
   --padding-start: 12px;
-  --padding-end: 40px; /* espaço para o botão com ícone */
+  --padding-end: 72px; /* espaço para dois botões */
+   --background: #ffffff !important;
+  background: #ffffff !important;
+
+    --highlight-color-focused: transparent;
+  --highlight-color: transparent;
+  --highlight-color-valid: transparent;
+  --highlight-color-invalid: transparent;
 }
 
-/* Botão quadradinho do calendário dentro do campo */
+/* ============================= */
+/* 📅 BOTÃO CALENDÁRIO */
+/* ============================= */
+
 .os-date-btn {
   position: absolute;
-  z-index: 2;              /* FICA POR CIMA DO INPUT */
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 6px;
   border: 1px solid #dde5f2;
   background: #f4f7ff;
@@ -140,6 +151,8 @@
   align-items: center;
   justify-content: center;
   padding: 0;
+  z-index: 2;
+  cursor: pointer;
 }
 
 .os-date-btn ion-icon {
@@ -147,7 +160,42 @@
   color: #a0b2cf;
 }
 
-/* Botão PESQUISAR */
+/* ============================= */
+/* ❌ BOTÃO LIMPAR DATA */
+/* ============================= */
+
+.os-date-clear {
+  position: absolute;
+  right: 46px; /* antes do calendário */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: #e6edf7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 3; /* acima do calendário */
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.os-date-clear ion-icon {
+  font-size: 16px;
+  color: #7a8ca8;
+}
+
+.os-date-clear:hover {
+  background: #dbe7f7;
+}
+
+/* ============================= */
+/* 🔵 BOTÃO PESQUISAR */
+/* ============================= */
+
 .os-actions {
   margin-top: 18px;
 }
@@ -160,3 +208,4 @@
   letter-spacing: 0.8px;
   font-size: 13px;
 }
+

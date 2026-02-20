@@ -56,14 +56,13 @@ export class AbastecimentoPostosPesquisaPage implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
-      this.filtrosAtuais = {
-        fornecedor: (params['fornecedor'] ?? '')?.toString(),
-        equipamento: (params['equipamento'] ?? '')?.toString(),
-        dataInicial: (params['dataInicial'] ?? null) as string | null,
-        dataFinal: (params['dataFinal'] ?? null) as string | null,
-        numVoucher: (params['numVoucher'] ?? '')?.toString(),
-      };
-
+this.filtrosAtuais = {
+  fornecedor: (params['fornecedorId'] ?? '')?.toString(),
+  equipamento: (params['equipamentoId'] ?? '')?.toString(),
+  dataInicial: (params['dataInicial'] ?? null) as string | null,
+  dataFinal: (params['dataFinal'] ?? null) as string | null,
+  numVoucher: (params['numVoucher'] ?? '')?.toString(),
+};
       this.buscarAbastecimentos(this.filtrosAtuais);
     });
   }

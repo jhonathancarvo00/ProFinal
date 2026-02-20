@@ -17,134 +17,185 @@
   <div class="os-page">
     <div class="os-card">
 
-      <!-- Equipamento -->
-      <div class="abp-field">
-        <label class="abp-label">Equipamento</label>
-          <ion-select class="abp-input abp-select" interface="popover" placeholder="Selecione" [(ngModel)]="equipamento" [compareWith]="compareLookupId">
-            <ion-select-option *ngFor="let eq of equipamentos" [value]="eq.id">{{ eq.nome || eq.descricao || eq.label || eq.placa || eq.modelo }}</ion-select-option>
-          </ion-select>
-      </div>
+<!-- Equipamento -->
+<div class="abp-field">
+  <label class="abp-label">Equipamento</label>
+  <app-autocomplete
+    [lista]="equipamentos"
+    campoDescricao="descricao"
+    [valorSelecionado]="equipamento"
+    (selecionado)="equipamento = $event?.id ?? null">
+  </app-autocomplete>
+</div>
 
-      <!-- Empreendimento / Empresa -->
-      <div class="abp-field">
-        <div class="abp-field abp-half">
-          <label class="abp-label">Empreendimento</label>
-            <ion-select class="abp-input abp-select" interface="popover" placeholder="Selecione" [(ngModel)]="empreendimento" [compareWith]="compareLookupId" (ionChange)="onEmpreendimentoChange($event.detail.value)">
-              <ion-select-option *ngFor="let emp of empreendimentos" [value]="emp.id">{{ emp.nome || emp.descricao || emp.label }}</ion-select-option>
-            </ion-select>
-        </div>
+<!-- Empreendimento -->
+<div class="abp-field">
+  <label class="abp-label">Empreendimento</label>
+  <app-autocomplete
+    [lista]="empreendimentos"
+    campoDescricao="descricao"
+    [valorSelecionado]="empreendimento"
+    (selecionado)="onEmpreendimentoChange($event?.id)">
+  </app-autocomplete>
+</div>
 
-        <div class="abp-field abp-half">
-          <label class="abp-label">Empresa</label>
-            <ion-select class="abp-input abp-select" interface="popover" placeholder="Selecione" [(ngModel)]="empresa" [compareWith]="compareLookupId" (ionChange)="onEmpresaChange($event.detail.value)">
-              <ion-select-option *ngFor="let emp of empresas" [value]="emp.id">{{ emp.descricao }}</ion-select-option>
-            </ion-select>
-        </div>
-      </div>
+<!-- Empresa -->
+<div class="abp-field">
+  <label class="abp-label">Empresa</label>
+  <app-autocomplete
+    [lista]="empresas"
+    campoDescricao="descricao"
+    [valorSelecionado]="empresa"
+    (selecionado)="onEmpresaChange($event?.id)">
+  </app-autocomplete>
+</div>
 
-      <!-- Fornecedor / Centro de despesas -->
-      <div class="abp-field">
-        <div class="abp-field abp-half">
-          <label class="abp-label">Fornecedor</label>
-            <ion-select class="abp-input abp-select" interface="popover" placeholder="Selecione" [(ngModel)]="fornecedor" [compareWith]="compareLookupId">
-              <ion-select-option *ngFor="let f of fornecedores" [value]="f.id">{{ f.descricao }}</ion-select-option>
-            </ion-select>
-        </div>
+<!-- Fornecedor -->
+<div class="abp-field">
+  <label class="abp-label">Fornecedor</label>
+  <app-autocomplete
+    [lista]="fornecedores"
+    campoDescricao="descricao"
+    [valorSelecionado]="fornecedor"
+    (selecionado)="fornecedor = $event?.id ?? null">
+  </app-autocomplete>
+</div>
 
-        <div class="abp-field abp-half">
-          <label class="abp-label">Centro de despesas</label>
-            <ion-select class="abp-input abp-select" interface="popover" placeholder="Selecione" [(ngModel)]="centroDespesas" [compareWith]="compareLookupId" (ionChange)="onCentroDespesaChange($event.detail.value)">
-              <ion-select-option *ngFor="let c of centrosDespesas" [value]="c.id ?? c.planoContasId ?? c.planoContasDespesaId">
-                {{ c.descricao || c.planoContasDescr || c.nome || c.label }}
-              </ion-select-option>
-            </ion-select>
-        </div>
-      </div>
+<!-- Centro de despesas -->
+<div class="abp-field">
+  <label class="abp-label">Centro de despesas</label>
+  <app-autocomplete
+    [lista]="centrosDespesas"
+    campoDescricao="descricao"
+    [valorSelecionado]="centroDespesas"
+    (selecionado)="centroDespesas = $event?.id ?? null">
+  </app-autocomplete>
+</div>
 
-      <!-- Etapa / Insumo -->
-      <div class="abp-field">
-        <div class="abp-field abp-half">
-          <label class="abp-label">Etapa</label>
-            <ion-select class="abp-input abp-select" interface="popover" placeholder="Selecione" [(ngModel)]="etapa" [compareWith]="compareLookupId">
-              <ion-select-option *ngFor="let e of etapas" [value]="e.id">{{ e.descricao }}</ion-select-option>
-            </ion-select>
-        </div>
+<!-- Etapa -->
+<div class="abp-field">
+  <label class="abp-label">Etapa</label>
+  <app-autocomplete
+    [lista]="etapas"
+    campoDescricao="descricao"
+    [valorSelecionado]="etapa"
+    (selecionado)="etapa = $event?.id ?? null">
+  </app-autocomplete>
+</div>
 
-        <div class="abp-field abp-half">
-          <label class="abp-label">Insumo</label>
-            <ion-select class="abp-input abp-select" interface="popover" placeholder="Selecione" [(ngModel)]="insumo" [compareWith]="compareLookupId" (ionChange)="onInsumoChange($event.detail.value)">
-              <ion-select-option *ngFor="let i of insumos" [value]="i.id ?? i.insumoId">
-                {{ i.descricao || i.insumoDescr || i.nome || i.label }}
-              </ion-select-option>
-            </ion-select>
-        </div>
-      </div>
+<!-- Insumo -->
+<div class="abp-field">
+  <label class="abp-label">Insumo</label>
+  <app-autocomplete
+    [lista]="insumos"
+    campoDescricao="descricao"
+    [valorSelecionado]="insumo"
+    (selecionado)="onInsumoChange($event?.id)">
+  </app-autocomplete>
+</div>
 
-      <!-- Observação -->
-      <div class="abp-group-row">
-        <div class="abp-field abp-half">
-        <label class="abp-label">Observação</label>
-          <ion-input class="abp-input" type="text" [(ngModel)]="observacao"></ion-input>
-      </div>
-      </div>
+<!-- Observação -->
+<div class="abp-field">
+  <label class="abp-label">Observação</label>
+<input
+  type="text"
+  class="os-input"
+  [(ngModel)]="observacao"
+/>
+</div>
+
+<!-- Bloco -->
+<div class="abp-field">
+  <label class="abp-label">Bloco</label>
+  <app-autocomplete
+    [lista]="blocos"
+    campoDescricao="descricao"
+    [valorSelecionado]="bloco"
+    (selecionado)="bloco = $event?.id ?? null">
+  </app-autocomplete>
+</div>
 
 
-      <!-- Bloco -->
-      <div class="abp-field">
-        <label class="abp-label">Bloco</label>
-        <ion-select class="abp-input abp-select" interface="popover" placeholder="Selecione" [(ngModel)]="bloco" [compareWith]="compareLookupId">
-          <ion-select-option *ngFor="let b of blocos" [value]="b.id">{{ b.descricao }}</ion-select-option>
-        </ion-select>
-      </div>
+
 
       <!-- Título seção Dados de Retorno -->
       <div class="abp-section-title">
         DADOS DE RETORNO
       </div>
 
-      <!-- Dt.Retirada / Qtd. Retirada / Total -->
-      <div class="abp-group-row">
-        <div class="abp-field abp-third">
-          <label class="abp-label">Dt.Retirada</label>
-          <div class="abp-date-input" (click)="openCalendar($event, 'dtRetirada')">
-            <ion-input
-              class="abp-input abp-date-display"
-              readonly
-              placeholder="dd/mm/aaaa"
-              [value]="formatDate(dtRetirada)">
-            </ion-input>
+<!-- DATA  -->
+<div class="abp-field">
+  <label class="abp-label">Dt.Retirada</label>
 
-            <button
-              type="button"
-              class="abp-date-btn"
-              aria-label="Abrir calendário"
-              title="Abrir calendário"
-              (click)="openCalendar($event, 'dtRetirada'); $event.stopPropagation()">
-              <ion-icon name="calendar-clear-outline"></ion-icon>
-            </button>
-          </div>
-        </div>
+  <div class="abp-date-input">
 
-        <div class="abp-field abp-third">
-          <label class="abp-label">Quantidade</label>
-            <ion-input class="abp-input" type="number" [(ngModel)]="qtdRetirada"></ion-input>
-        </div>
+    <input
+      type="text"
+      class="os-input abp-date-display"
+      readonly
+      placeholder="dd/mm/aaaa"
+      [value]="formatDate(dtRetirada)"
+      (click)="openCalendar($event, 'dtRetirada')"
+    />
 
-        <div class="abp-field abp-third">
-          <label class="abp-label">Total</label>
-            <ion-input class="abp-input" type="number" [(ngModel)]="total"></ion-input>
-        </div>
-      </div>
+    <button
+      *ngIf="dtRetirada"
+      type="button"
+      class="abp-date-clear"
+      (click)="limparData('dtRetirada', $event)">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+
+    <button
+      type="button"
+      class="abp-date-btn"
+      (click)="openCalendar($event, 'dtRetirada')">
+      <ion-icon name="calendar-clear-outline"></ion-icon>
+    </button>
+
+  </div>
+</div>
+
+<!-- QUANTIDADE + TOTAL  -->
+<div class="abp-group-row">
+
+  <div class="abp-field abp-half">
+    <label class="abp-label">Quantidade</label>
+    <input
+      type="number"
+      class="os-input"
+      [(ngModel)]="qtdRetirada"
+    />
+  </div>
+
+  <div class="abp-field abp-half">
+    <label class="abp-label">Total</label>
+    <input
+      type="number"
+      class="os-input"
+      [(ngModel)]="total"
+    />
+  </div>
+
+</div>
 
       <!-- Hodômetro / Horímetro -->
       <div class="abp-group-row">
         <div class="abp-field abp-half">
           <label class="abp-label">Hodômetro</label>
-            <ion-input class="abp-input" type="number" [(ngModel)]="hodometro"></ion-input>
+            <input
+  type="number"
+  class="os-input"
+  [(ngModel)]="hodometro"
+/>
         </div>
         <div class="abp-field abp-half">
           <label class="abp-label">Horímetro</label>
-            <ion-input class="abp-input" type="number" [(ngModel)]="horimetro"></ion-input>
+            <input
+  type="number"
+  class="os-input"
+  [(ngModel)]="horimetro"
+/>
         </div>
 
         <!-- Retorno? -->
@@ -159,7 +210,11 @@
         <div class="abp-group-row">
         <div class="abp-field abp-half">
           <label class="abp-label">Nº Ctrl Posto</label>
-          <ion-input class="abp-input" [(ngModel)]="numeroControlePosto"></ion-input>
+          <input
+  type="text"
+  class="os-input"
+  [(ngModel)]="numeroControlePosto"
+/>
         </div>
 
         <div class="abp-checkbox-group">

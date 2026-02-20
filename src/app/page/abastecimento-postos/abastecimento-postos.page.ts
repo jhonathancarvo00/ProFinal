@@ -3,6 +3,7 @@ import { PopoverController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { format, parseISO } from 'date-fns';
 import { CalendarPopoverComponent } from '../../components/calendar-popover/calendar-popover.component';
+import { AbastecimentoService } from '../../services/abastecimento.service';
 
 @Component({
   selector: 'app-abastecimento-postos',
@@ -12,8 +13,24 @@ import { CalendarPopoverComponent } from '../../components/calendar-popover/cale
 })
 export class AbastecimentoPostosPage implements OnInit {
 
-  fornecedor = '';
-  equipamento = '';
+  // ===============================
+  // 🔹 LISTAS DO AUTOCOMPLETE
+  // ===============================
+
+  fornecedoresLista: any[] = [];
+  equipamentosLista: any[] = [];
+
+  // ===============================
+  // 🔹 IDS SELECIONADOS
+  // ===============================
+
+  fornecedorId: string | null = null;
+  equipamentoId: string | null = null;
+
+  // ===============================
+  // 🔹 OUTROS CAMPOS
+  // ===============================
+
   numeroVoucher = '';
 
   dataInicial: string | null = null;
@@ -21,16 +38,71 @@ export class AbastecimentoPostosPage implements OnInit {
 
   constructor(
     private popoverCtrl: PopoverController,
-    private router: Router
-  ) { }
+    private router: Router,
+    private abastecimentoService: AbastecimentoService
+  ) {}
 
-  ngOnInit() {}
+  // ===============================
+  // 🔹 INIT
+  // ===============================
 
-  // casinha no header (mesmo padrão do abastecimento próprio)
+  ngOnInit() {
+    this.carregarListas();
+  }
+
+  // ===============================
+  // 🔹 CARREGAR LISTAS REAIS (API)
+  // ===============================
+
+  carregarListas() {
+
+    // 🔥 FORNECEDORES (mesma API da edição)
+    this.abastecimentoService.listarFornecedores().subscribe({
+      next: dados => {
+        this.fornecedoresLista = dados ?? [];
+      },
+      error: err => {
+        console.error('[FORNECEDORES] Erro ao carregar:', err);
+        this.fornecedoresLista = [];
+      }
+    });
+
+    // 🔥 EQUIPAMENTOS (mesma API da edição)
+    this.abastecimentoService.listarEquipamentosMobile().subscribe({
+      next: dados => {
+        this.equipamentosLista = dados ?? [];
+      },
+      error: err => {
+        console.error('[EQUIPAMENTOS] Erro ao carregar:', err);
+        this.equipamentosLista = [];
+      }
+    });
+
+  }
+
+  // ===============================
+  // 🔹 EVENTOS AUTOCOMPLETE
+  // ===============================
+
+  onFornecedorSelecionado(item: any) {
+    this.fornecedorId = item?.id ?? null;
+  }
+
+  onEquipamentoSelecionado(item: any) {
+    this.equipamentoId = item?.id ?? null;
+  }
+
+  // ===============================
+  // 🔹 HEADER
+  // ===============================
+
   onBack() {
     this.router.navigate(['/tabs/abastecimento']);
-    // se o menu principal for outra rota, é só trocar aqui
   }
+
+  // ===============================
+  // 🔹 CALENDÁRIO
+  // ===============================
 
   async openCalendar(event: any, fieldName: 'dataInicial' | 'dataFinal') {
     const popover = await this.popoverCtrl.create({
@@ -45,13 +117,18 @@ export class AbastecimentoPostosPage implements OnInit {
 
     const { data } = await popover.onDidDismiss();
 
-    if (data && data.date) {
+    if (data?.date) {
       if (fieldName === 'dataInicial') {
         this.dataInicial = data.date;
       } else {
         this.dataFinal = data.date;
       }
     }
+  }
+
+  limparData(campo: 'dataInicial' | 'dataFinal', event: Event) {
+    event.stopPropagation();
+    this[campo] = null;
   }
 
   formatDate(isoString: string | null): string {
@@ -63,10 +140,14 @@ export class AbastecimentoPostosPage implements OnInit {
     }
   }
 
+  // ===============================
+  // 🔹 PESQUISAR
+  // ===============================
+
   pesquisar() {
     const filtros = {
-      fornecedor: this.fornecedor,
-      equipamento: this.equipamento,
+      fornecedorId: this.fornecedorId,
+      equipamentoId: this.equipamentoId,
       dataInicial: this.dataInicial,
       dataFinal: this.dataFinal,
       numVoucher: this.numeroVoucher,
@@ -79,11 +160,6 @@ export class AbastecimentoPostosPage implements OnInit {
   }
 
   novo() {
-    console.log('Navegando para a página de edição de abastecimento em postos...');
     this.router.navigate(['/tabs/abastecimento-postos-edicao']);
-  }
-
-  novoAbastecimento() {
-    this.novo();
   }
 }

@@ -6,13 +6,16 @@ import { AbastecimentoPostosEdicaoPageRoutingModule } from './abastecimento-post
 import { AbastecimentoPostosEdicaoPage } from './abastecimento-postos-edicao.page';
 import { CalendarPopoverComponentModule } from '../../components/calendar-popover/calendar-popover.module';
 
+import { AutocompleteComponent } from '../../components/autocomplete/autocomplete.component';
+
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
     AbastecimentoPostosEdicaoPageRoutingModule,
-    CalendarPopoverComponentModule
+    CalendarPopoverComponentModule,
+     AutocompleteComponent 
   ],
   declarations: [AbastecimentoPostosEdicaoPage]
 })

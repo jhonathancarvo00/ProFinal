@@ -1,4 +1,7 @@
-/* HEADER no padrão das outras telas */
+/* ======================================================
+   HEADER PADRÃO
+====================================================== */
+
 .os-header,
 .os-header ion-toolbar {
   --background: #f4f6f9 !important;
@@ -38,7 +41,10 @@
   color: #2d6fb1;
 }
 
-/* Fundo da página */
+/* ======================================================
+   FUNDO E CARD
+====================================================== */
+
 .os-content {
   --background: #f4f6f9;
 }
@@ -49,7 +55,6 @@
   padding: 12px 12px 24px;
 }
 
-/* Card principal */
 .os-card {
   width: 100%;
   max-width: 420px;
@@ -59,9 +64,12 @@
   padding: 18px 18px 24px;
 }
 
-/* Campos base */
+/* ======================================================
+   CAMPOS
+====================================================== */
+
 .abp-field {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .abp-label {
@@ -72,69 +80,113 @@
   color: #2d6fb1;
 }
 
-.abp-input {
-  --background: #f9fbff;
-  --padding-start: 10px;
-  --padding-end: 10px;
-  --min-height: 40px;
-  --color: #3a3a3a;
+/* ======================================================
+   INPUT PADRÃO SISTEMA (IGUAL VOUCHER)
+====================================================== */
 
-  border-radius: 8px;
-  border: 1px solid #dde5f2;
-  font-size: 13px;
+.os-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
 
-  /* foco azul igual as outras telas */
-  --highlight-color-focused: #2d6fb1;
-  --highlight-color: #2d6fb1;
-  --highlight-color-valid: #2d6fb1;
-  --highlight-color-invalid: #2d6fb1;
+  border: 1px solid #d6dbe1;
+  border-radius: 12px;
+  background: #ffffff;
+
+  font-size: 14px;
+  color: #2c3e50;
+
+  box-sizing: border-box;
+  outline: none;
+  transition: border 0.2s ease;
+  cursor: text;
 }
 
-.abp-input.ion-focused {
-  border-color: #2d6fb1 !important;
+/* foco preto padrão sistema */
+.os-input:focus {
+  border: 2px solid #000000;
 }
 
-/* Select no mesmo estilo */
-.abp-select {
-  --color: #333;
-  --placeholder-color: #a0b2cf;
-  --placeholder-opacity: 1;
-  --padding-end: 32px;
+/* remove linha interna do ionic (caso use ion-input) */
+ion-input::part(native) {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-/* Linhas com 2 ou 3 colunas */
+/* ======================================================
+   SELECT PADRÃO
+====================================================== */
+
+ion-select.abp-select {
+  --background: #ffffff;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --min-height: 44px;
+  --color: #2c3e50;
+
+  border: 1px solid #d6dbe1;
+  border-radius: 12px;
+
+  --highlight-color-focused: transparent;
+  --highlight-color: transparent;
+  --highlight-color-valid: transparent;
+  --highlight-color-invalid: transparent;
+}
+
+ion-select.abp-select.ion-focused {
+  border: 2px solid #000 !important;
+}
+
+ion-select.abp-select::part(text) {
+  color: #2c3e50 !important;
+  opacity: 1 !important;
+}
+
+/* ======================================================
+   LAYOUT EM COLUNAS
+====================================================== */
+
 .abp-group-row {
   display: flex;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .abp-half {
-  flex: 1 1 0;
-  min-width: 0;
-  overflow: hidden;
+  flex: 1;
 }
 
-.abp-input {
-  --background: #f9fbff;
-  --padding-start: 10px;
-  --padding-end: 10px;
-  --min-height: 40px;
-  --color: #3a3a3a;
+.abp-third {
+  flex: 1;
+}
 
-  border-radius: 8px;
-  border: 1px solid #dde5f2;
-  font-size: 13px;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* ======================================================
+   DATA INPUT
+====================================================== */
 
-  /* foco azul igual as outras telas */
-  --highlight-color-focused: #2d6fb1;
-  --highlight-color: #2d6fb1;
-  --highlight-color-valid: #2d6fb1;
-  --highlight-color-invalid: #2d6fb1;
+.abp-date-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.abp-date-display {
+  flex: 1;
+}
+
+.abp-date-btn {
+  position: absolute;
+  right: 10px;
+  background: #f4f7ff;
+  border: 1px solid #d6dbe1;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .abp-date-btn ion-icon {
@@ -142,54 +194,10 @@
   color: #a0b2cf;
 }
 
-/* Título da seção de retorno */
-.abp-section-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: #2d6fb1;
-  margin-top: 14px;
-  margin-bottom: 8px;
-}
+/* ======================================================
+   CHECKBOX
+====================================================== */
 
-/* Botão confirmar */
-.abp-actions {
-  margin-top: 18px;
-}
-
-.abp-primary-btn {
-  width: 100%;
-  border: none;
-  border-radius: 22px;
-  padding: 10px 16px;
-  background: #e4f1ff;
-  color: #2d6fb1;
-  font-weight: 600;
-  letter-spacing: 0.8px;
-  font-size: 13px;
-}
-
-/* Força o texto do ion-select a ficar visível */
-ion-select.abp-select {
-  --placeholder-color: #9a9a9a;
-  --placeholder-opacity: 1;
-}
-
-/* Parte interna do texto selecionado dentro do ion-select */
-ion-select.abp-select::part(text) {
-  color: #333 !important;
-  opacity: 1 !important;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-/* AJUSTE: divisor da seção */
-.abp-divider {
-  height: 1px;
-  background: #dde5f2;
-  margin: 16px 0 8px;
-}
-
-/* AJUSTE: checkbox alinhado */
 .abp-checkbox-group {
   display: flex;
   align-items: center;
@@ -197,4 +205,103 @@ ion-select.abp-select::part(text) {
   margin-top: 22px;
   font-size: 12px;
   color: #2d6fb1;
+}
+
+/* ================= CHECKBOX PADRÃO SISTEMA ================= */
+
+ion-checkbox {
+  --size: 18px;
+
+  /* Fundo quando NÃO marcado */
+  --background: #ffffff;
+  --border-color: #d6dbe1;
+
+  /* Fundo quando marcado */
+  --checkbox-background-checked: #2d6fb1;
+  --border-color-checked: #2d6fb1;
+
+  /* Remove efeito estranho */
+  --background-checked: #2d6fb1;
+}
+
+/* ======================================================
+   SEÇÃO
+====================================================== */
+
+.abp-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2d6fb1;
+  margin-top: 18px;
+  margin-bottom: 12px;
+}
+
+/* ======================================================
+   BOTÃO
+====================================================== */
+
+.abp-actions {
+  margin-top: 22px;
+}
+
+.abp-primary-btn {
+  width: 100%;
+  border: none;
+  border-radius: 24px;
+  padding: 12px;
+
+  background: linear-gradient(135deg, #4c8dff, #2d6fb1);
+  color: #ffffff;
+
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+/* ================= BOTÃO LIMPAR DATA ================= */
+
+.abp-date-clear {
+  position: absolute;
+  right: 44px; /* antes do calendário */
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 26px;
+  height: 26px;
+
+  border-radius: 50%;
+  border: none;
+  background: #e6edf7;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.abp-date-clear ion-icon {
+  font-size: 16px;
+  color: #7a8ca8;
+}
+
+.abp-date-clear:hover {
+  background: #dbe7f7;
+}
+/* ================= CHECKBOX PADRÃO SISTEMA ================= */
+
+ion-checkbox::part(container) {
+  background: #ffffff !important;
+  border: 1px solid #d6dbe1 !important;
+  border-radius: 4px;
+}
+
+/* Quando estiver marcado */
+ion-checkbox.checkbox-checked::part(container) {
+  background: #2d6fb1 !important;
+  border: 1px solid #2d6fb1 !important;
+}
+
+/* Cor do ícone de check */
+ion-checkbox::part(mark) {
+  color: #ffffff;
 }
