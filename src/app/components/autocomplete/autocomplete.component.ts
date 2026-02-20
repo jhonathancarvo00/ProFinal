@@ -109,6 +109,14 @@ export class AutocompleteComponent implements OnChanges {
     this.selecionado.emit(null);
   }
 
+  isSelecionado(item: any): boolean {
+    if (!item) return false;
+    // Compara por id, codigo ou valor
+    const idItem = String(item.id ?? item.codigo ?? item.valor);
+    const idSelecionado = String(this.valorSelecionado);
+    return idItem === idSelecionado;
+  }
+
   fecharComDelay() {
     setTimeout(() => {
       this.aberto = false;

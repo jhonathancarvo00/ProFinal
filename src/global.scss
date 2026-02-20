@@ -136,6 +136,7 @@ app-allRequest,app-request,app-insumos,app-centeal-estoque,app-detail-request{
                 text-transform:lowercase;
                 margin-bottom: 7px;
                 margin-top: 7px;
+                color: #000 !important;
             }
             &:first-child{
                 border-radius:9px 9px 0px 0px;
@@ -454,8 +455,9 @@ ion-select-popover {
 
 /* itens da lista */
 ion-select-popover ion-item {
-  --background: #ffffff !important;
-  --color: #333 !important;
+    --background: #ffffff !important;
+    --color: #000 !important;
+    color: #000 !important;
 }
 
 /* hover suave */

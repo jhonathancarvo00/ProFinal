@@ -26,7 +26,7 @@
                   [placeholder]="strStatusPadrao" formControlName="statusId"
                   [value]="codStatusPadrao" style="background: white;" interface="action-sheet"
                   [interfaceOptions]="{ cssClass: 'my-custom-interface' }" >
-              <ion-select-option  [value]="item.id" style="color: white;" *ngFor="let item of listStatus">{{item.descricao}}</ion-select-option>
+              <ion-select-option  [value]="item.id" style="color: black;" *ngFor="let item of listStatus">{{item.descricao}}</ion-select-option>
           </ion-select>
       </ion-item>
     </ion-col>
