@@ -249,7 +249,7 @@ export class OrdemServicoEdicaoPage implements OnInit {
     private ordemService: OrdemServicoService,
     private toastCtrl: ToastController, //  ALTERAÇÃO injeção do ToastController
     private sanitizer: DomSanitizer,
-    private elementRef: ElementRef//novo 
+    private elementRef: ElementRef//novo
   ) {}
 
 @HostListener('document:click', ['$event'])
@@ -267,7 +267,7 @@ fecharDropdownAoClicarFora(event: Event) {
     // Então recarregamos as fotos do cache aqui para atualizar a grade imediatamente.
     this.atualizarPreviewFoto();
   }
-  
+
 
   ngOnInit() {
     // Inicializa campos em branco por padrão
@@ -287,7 +287,7 @@ fecharDropdownAoClicarFora(event: Event) {
       this.dataAbertura = new Date().toISOString(); // ← data atual
       this.dataConclusao = null;
     };
-    
+
     this.route.queryParams.subscribe((params) => {
       // Sempre limpar os campos ao criar nova OS (sem parâmetro 'os')
       if (!params || !params['os']) {
@@ -308,9 +308,9 @@ fecharDropdownAoClicarFora(event: Event) {
 
         });
         return;
-        
+
       }
-        
+
 
       // Se houver parâmetro 'os', preenche os campos (edição)
       if (params && params['os']) {
@@ -1411,14 +1411,14 @@ private carregarOsCompleta(osId: string) {
         osApi.observacao ?? osApi.Observacao ?? '';
 
       this.hodometro =
-        osApi.odometro !== null && osApi.odometro !== undefined
-          ? String(osApi.odometro)
-          : '';
+        osApi.odometro === null || osApi.odometro === undefined || osApi.odometro === 0 || osApi.odometro === '0'
+          ? ''
+          : String(osApi.odometro);
 
       this.horimetro =
-        osApi.horimetro !== null && osApi.horimetro !== undefined
-          ? String(osApi.horimetro)
-          : '';
+        osApi.horimetro === null || osApi.horimetro === undefined || osApi.horimetro === 0 || osApi.horimetro === '0'
+          ? ''
+          : String(osApi.horimetro);
 
       this.dataAbertura =
         osApi.osDataAbertura ?? osApi.DataAbertura ?? null;
@@ -1429,87 +1429,92 @@ private carregarOsCompleta(osId: string) {
       // ===============================
       // 🔎 EQUIPAMENTO
       // ===============================
-      const equipamento = this.equipamentosLista.find(
-        (e: any) =>
-          String(e.id) === String(osApi.equipId ?? osApi.EquipamentoId)
-      );
+      let equipamento = null;
+      const equipId = String(osApi.equipId ?? osApi.EquipamentoId ?? '');
+      if (equipId && equipId !== '00000000-0000-0000-0000-000000000000') {
+        equipamento = this.equipamentosLista.find((e: any) => String(e.id) === equipId);
+      }
       this.equipamento = equipamento?.id || '';
 
       // ===============================
       // 🔎 STATUS
       // ===============================
-      const status = this.statusLista.find(
-        (s: any) =>
-          String(s.valor ?? s.codigo ?? s.id) ===
-          String(osApi.statusCod ?? osApi.Status)
-      );
-      this.statusCodigo = status?.valor ?? 1;
+      let status = null;
+      const statusCodRaw = osApi.statusCod ?? osApi.Status;
+      const statusCod = Number(statusCodRaw);
+      // Se for null, undefined, vazio ou zero, não exibe nada
+      if (!statusCodRaw || statusCodRaw === '' || statusCod === 0 || statusCodRaw === null || statusCodRaw === undefined) {
+        this.statusCodigo = null;
+      } else {
+        status = this.statusLista.find((s: any) => String(s.valor ?? s.codigo ?? s.id) === String(statusCod));
+        this.statusCodigo = status?.valor ?? null;
+      }
 
       // ===============================
       // 🔎 EMPREENDIMENTO
       // ===============================
-       this.empreendimento = osApi.emprdId ?? osApi.emprdintervencaoId ?? '';
+      const empId = String(osApi.emprdId ?? osApi.emprdintervencaoId ?? '');
+      this.empreendimento = (empId && empId !== '00000000-0000-0000-0000-000000000000') ? empId : '';
 
-       
+
       // ===============================
       // 🔎 CLASSIFICAÇÃO
       // ===============================
-      const classificacao = this.classificacoesLista.find(
-        (c: any) =>
-          String(c.codigo ?? c.classifCod ?? c.ClassificacaoId) ===
-          String(osApi.classifCod ?? osApi.ClassificacaoId)
-      );
+      let classificacao = null;
+      const classifId = String(osApi.classifCod ?? osApi.ClassificacaoId ?? '');
+      if (classifId && classifId !== '00000000-0000-0000-0000-000000000000') {
+        classificacao = this.classificacoesLista.find((c: any) => String(c.codigo ?? c.classifCod ?? c.ClassificacaoId) === classifId);
+      }
       this.classificacao = classificacao?.id || '';
 
       // ===============================
       // 🔎 TIPO
       // ===============================
-      const tipo = this.tiposOsLista.find(
-        (t: any) =>
-          String(t.codigo ?? t.tpServCod ?? t.TipoServicoId) ===
-          String(osApi.tpServCod ?? osApi.TipoServicoId)
-      );
+      let tipo = null;
+      const tipoId = String(osApi.tpServCod ?? osApi.TipoServicoId ?? '');
+      if (tipoId && tipoId !== '00000000-0000-0000-0000-000000000000' && tipoId !== '0') {
+        tipo = this.tiposOsLista.find((t: any) => String(t.codigo ?? t.tpServCod ?? t.TipoServicoId) === tipoId);
+      }
       this.tipo = tipo?.id || '';
 
       // ===============================
       // 🔎 CAUSA INTERVENÇÃO
       // ===============================
-      const causa = this.causasIntervencaoLista.find(
-        (c: any) =>
-          String(c.id ?? c.codigo ?? c.CausaIntervencao) ===
-          String(osApi.causasId ?? osApi.CausasId)
-      );
+      let causa = null;
+      const causaId = String(osApi.causasId ?? osApi.CausasId ?? '');
+      if (causaId && causaId !== '00000000-0000-0000-0000-000000000000') {
+        causa = this.causasIntervencaoLista.find((c: any) => String(c.id ?? c.codigo ?? c.CausaIntervencao) === causaId);
+      }
       this.causaIntervencao = causa?.id || '';
 
       // ===============================
       // 🔎 OPERADOR
       // ===============================
-      const operador = this.motoristasLista.find(
-        (m: any) =>
-          String(m.fornCod ?? '').trim() ===
-          String(osApi.colaboradorCod ?? '').trim()
-      );
-
+      let operador = null;
+      const colaboradorId = String(osApi.colaboradorCod ?? osApi.colaColaboradorId ?? '');
+      if (colaboradorId && colaboradorId !== '00000000-0000-0000-0000-000000000000') {
+        operador = this.motoristasLista.find((m: any) => String(m.fornCod ?? '').trim() === colaboradorId.trim());
+      }
       this.operadorMotorista = operador ? String(operador.id) : '';
 
       // ===============================
       // 🔎 MANUTENTOR
       // ===============================
-      const manutentor = this.manutentoresLista.find(
-        (m: any) =>
-          String(m.id ?? m.manutentorId ?? m.colaboradorCod) ===
-          String(osApi.manutentorId ?? osApi.ManutentorResponsavelId)
-      );
+      let manutentor = null;
+      const manutentorId = String(osApi.manutentorId ?? osApi.ManutentorResponsavelId ?? '');
+      if (manutentorId && manutentorId !== '00000000-0000-0000-0000-000000000000') {
+        manutentor = this.manutentoresLista.find((m: any) => String(m.id ?? m.manutentorId ?? m.colaboradorCod) === manutentorId);
+      }
       this.manutentor = manutentor?.id || '';
 
       // ===============================
       // 🔎 EMPREENDIMENTO INTERVENÇÃO
       // ===============================
-      const empInterv = this.empreendimentosLista.find(
-        (e: any) =>
-          String(e.id ?? e.codigo ?? e.EmpreendimentoId) ===
-          String(osApi.emprdintervencaoId ?? osApi.emprdintervencaoCod)
-      );
+      let empInterv = null;
+      const empIntervId = String(osApi.emprdintervencaoId ?? osApi.emprdintervencaoCod ?? '');
+      if (empIntervId && empIntervId !== '00000000-0000-0000-0000-000000000000') {
+        empInterv = this.empreendimentosLista.find((e: any) => String(e.id ?? e.codigo ?? e.EmpreendimentoId) === empIntervId);
+      }
       this.empreendimentoIntervencao = empInterv?.id || '';
     },
   });
@@ -1553,10 +1558,10 @@ Horimetro: this.horimetro,
       DefeitosConstatados: (this.defeitosConstatados || '').toString().trim(),
       CausasProvaveis: (this.causasProvaveis || '').toString().trim(),
       Observacao: (this.observacoes || '').toString().trim(),
-      
+
     });
 
-    
+
    // Validação dos campos obrigatórios (apenas o que o usuário precisa preencher)
 const obrigatorios = ['Descricao', 'EquipamentoId'];
 
@@ -1613,7 +1618,7 @@ if (faltando.length > 0) {
          if (!isNovaOS) {
 
         //NOVO: navegar automaticamente para a tela de pesquisa
-this.router.navigate(['/tabs/ordem-servico-pesquisa'], {//DEFINIR PARA QUAL TELA REALMENTE DEVERA VOLTAR 
+this.router.navigate(['/tabs/ordem-servico-pesquisa'], {//DEFINIR PARA QUAL TELA REALMENTE DEVERA VOLTAR
   replaceUrl: true
 });
 
