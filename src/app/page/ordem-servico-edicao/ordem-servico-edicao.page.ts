@@ -14,6 +14,7 @@ import { IonicModule } from '@ionic/angular';
 import { CalendarPopoverComponentModule } from '../../components/calendar-popover/calendar-popover.module';
 import { AutocompleteComponent } from 'src/app/components/autocomplete/autocomplete.component';
 
+
 type FotoCacheItem = {
   id?: string;
   dataUrl: string;
@@ -57,6 +58,8 @@ export class OrdemServicoEdicaoPage implements OnInit {
 
   // Campos de texto e seleção
   numeroOS: string = '';
+  // Campo de retorno (numRetornoPosto)
+  retorno: string = '';
   // Id interno da OS (GUID) usado para update/anexos
   osId: string = '';
   fotos: FotoCacheItem[] = [];
@@ -292,6 +295,25 @@ fecharDropdownAoClicarFora(event: Event) {
       // Sempre limpar os campos ao criar nova OS (sem parâmetro 'os')
       if (!params || !params['os']) {
         this.carregarCombosComCallback(() => {
+                    // DEBUG: Exibe todos os campos da tela de edição ao abrir
+                    console.log('[DEBUG] Dados carregados para edição:', {
+                      numeroOS: this.numeroOS,
+                      osId: this.osId,
+                      descricao: this.descricao,
+                      equipamento: this.equipamento,
+                      empreendimento: this.empreendimento,
+                      empreendimentoIntervencao: this.empreendimentoIntervencao,
+                      classificacao: this.classificacao,
+                      tipo: this.tipo,
+                      causaIntervencao: this.causaIntervencao,
+                      operadorMotorista: this.operadorMotorista,
+                      manutentor: this.manutentor,
+                      statusCodigo: this.statusCodigo,
+                      dataAbertura: this.dataAbertura,
+                      dataConclusao: this.dataConclusao,
+                      retorno: this.retorno,
+                      // Adicione outros campos relevantes se necessário
+                    });
           limparCampos();
           this.atualizarPreviewFoto();
           this.ativarFiltroEquipamento();
@@ -363,24 +385,28 @@ fecharDropdownAoClicarFora(event: Event) {
           }
         }
         this.carregarCombosComCallback(() => {
-          // ...preenchimento dos campos como antes...
-          // Regra conforme documentação:
-          // - osCod: número/código da OS (aparece para o usuário)
-          // - osId/OsId: id interno (GUID) para edição/update
+
+          // Ajuste: mapeamento dos campos empresa e retorno
           const incomingOsId = String((os as any)?.OsId ?? (os as any)?.osId ?? (os as any)?.id ?? '');
           const incomingOsCod = String((os as any)?.osCod ?? (os as any)?.NumeroOs ?? (os as any)?.numeroOs ?? '');
 
-          // LOG: objeto OS completo recebido do backend
+          // Empresa (empreendimento)
+          const empresaId = os.emprdId ?? os.empresaId ?? '';
+          const empresaFound = this.empreendimentosLista.find(
+            (item) => item.id == empresaId || item.codigo == empresaId || item.empreendimentoId == empresaId
+          );
+          this.empreendimento = empresaFound ? String(empresaFound.id) : (this.empreendimentosLista[0]?.id || '');
 
+          // Retorno
+          this.retorno = String(os.numRetornoPosto ?? '');
+
+          // LOG: objeto OS completo recebido do backend
           // LOG: campos extras recebidos?
           const camposExtras = {
             defeitosConstatados: os.defeitosConstatados ?? os.DefeitosConstatados ?? os.defeitos ?? os.obsDef ?? '',
             causasProvaveis: os.causasProvaveis ?? os.CausasProvaveis ?? os.causas ?? os.obsCausas ?? '',
             observacoes: os.observacoes ?? os.Observacoes ?? os.observacao ?? os.Observacao ?? ''
           };
-          if (!camposExtras.defeitosConstatados && !camposExtras.causasProvaveis && !camposExtras.observacoes) {
-          } else {
-          }
 
           // Se a tela já tem um OsId mais novo (ex.: retornado após gravar) e o queryParam ainda tem o OsId antigo,
           // não sobrescreve o estado atual (isso quebrava a leitura do cache das fotos).
@@ -399,15 +425,9 @@ fecharDropdownAoClicarFora(event: Event) {
           }
           this.atualizarPreviewFoto();
 
-
-
-this.carregarCombosComCallback(() => {
-
-  if (incomingOsId && incomingOsId.length === 36) {
-    this.carregarOsCompleta(incomingOsId);
-  }
-
-});
+          if (incomingOsId && incomingOsId.length === 36) {
+            this.carregarOsCompleta(incomingOsId);
+          }
 
 /*
           this.descricao = String(os.osDescricao ?? os.descricao ?? os.Descricao ?? '');
