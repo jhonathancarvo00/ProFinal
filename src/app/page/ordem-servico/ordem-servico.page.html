@@ -26,11 +26,15 @@
     <div class="os-card">
 
       <!-- CAMPOS -->
-      <div class="os-field">
-        <label class="os-label">Número OS</label>
-        <ion-input class="os-input" [(ngModel)]="filtro.numeroOs"></ion-input>
-      </div>
+<div class="os-field">
+  <label class="os-label">Número OS</label>
 
+  <input
+    type="text"
+    class="os-input"
+    [(ngModel)]="filtro.numeroOs"
+  />
+</div>
       <div class="os-field">
         <label class="os-label">Empreendimento</label>
         <app-autocomplete
