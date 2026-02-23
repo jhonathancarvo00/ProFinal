@@ -72,84 +72,124 @@ export class AbastecimentoProprioEdicaoPage implements OnInit {
   public frentistaId: string | null = null;
   public emprdCod: number | null = null;
   public emprdId: string | null = null;
+
+
   // Funções de mudança de campos para o template HTML
-    onBombaChange(event: Event) {
-      const value = (event as CustomEvent).detail?.value;
-      const bombaId = value !== null && value !== undefined && String(value).trim() !== '' ? String(value) : null;
-      this.bombaSelecionada = bombaId;
-      this.bicoSelecionado = null;
-      this.bicos = [];
-      this.destinoSelecionado = null;
-      this.destinos = [];
-      this.insumoSelecionado = null;
-      this.insumos = [];
-      if (this.bombaSelecionada) {
-        this.carregarEmpreendimentoPorBomba(this.bombaSelecionada);
-        this.abastecimentoService.listarBicos(this.bombaSelecionada).subscribe({
-          next: (bicos) => {
-            this.bicos = bicos || [];
-            //
-          },
-            error: () => {
-            //
-          },
-        });
-        this.abastecimentoService.listarDestinos(this.bombaSelecionada).subscribe({
-          next: (destinos) => {
-            this.destinos = destinos || [];
-            //
-          },
-            error: () => {
-            //
-          },
-        });
-        this.abastecimentoService.listarInsumosComboio(this.bombaSelecionada).subscribe({
-          next: (insumos) => {
-            this.insumos = insumos || [];
-            //
-          },
-            error: () => {
-            //
-          },
-        });
-      } else {
-        this.empreendimentos = [];
-      }
-    }
+// =====================================================
+// 🔥 FUNÇÕES DE MUDANÇA DE CAMPOS (COM AUTOCOMPLETE)
+// =====================================================
 
-    onBicoChange(event: Event) {
-      const value = (event as CustomEvent).detail?.value;
-      this.bicoSelecionado = value !== null && value !== undefined && String(value).trim() !== '' ? String(value) : null;
-      //
-    }
+// =======================
+// BOMBA
+// =======================
 
-    onDestinoChange(event: Event) {
-      const value = (event as CustomEvent).detail?.value;
-      this.destinoSelecionado = value !== null && value !== undefined && String(value).trim() !== '' ? String(value) : null;
-      //
-    }
+onBombaChange(value: string | null) {
+  const bombaId = value ? String(value) : null;
 
-    onEtapaChange(event: Event) {
-      const value = (event as CustomEvent).detail?.value;
-      this.etapaSelecionada = String(value ?? '');
-      //
-    }
+  this.bombaSelecionada = bombaId;
+  this.bicoSelecionado = null;
+  this.bicos = [];
+  this.destinoSelecionado = null;
+  this.destinos = [];
+  this.insumoSelecionado = null;
+  this.insumos = [];
 
-    onInsumoChange(event: Event) {
-      const value = (event as CustomEvent).detail?.value;
-      this.insumoSelecionado = String(value ?? '');
-      //
-      // Limpar seleções anteriores
-      this.etapaSelecionada = null;
-      this.etapas = [];
-      this.aplicacaoSelecionada = null;
-      this.aplicacoes = [];
-      this.aplicacaoHabilitada = false;
-      this.tipoPrevAbast = null;
-      // Carregar etapas e aplicações
-      this.carregarEtapas();
-      this.carregarAplicacoes();
-    }
+  if (this.bombaSelecionada) {
+    this.carregarEmpreendimentoPorBomba(this.bombaSelecionada);
+
+    this.abastecimentoService.listarBicos(this.bombaSelecionada).subscribe({
+      next: (bicos) => {
+        this.bicos = bicos || [];
+      },
+      error: () => {},
+    });
+
+    this.abastecimentoService.listarDestinos(this.bombaSelecionada).subscribe({
+      next: (destinos) => {
+        this.destinos = destinos || [];
+      },
+      error: () => {},
+    });
+
+    this.abastecimentoService.listarInsumosComboio(this.bombaSelecionada).subscribe({
+      next: (insumos) => {
+        this.insumos = insumos || [];
+      },
+      error: () => {},
+    });
+
+  } else {
+    this.empreendimentos = [];
+  }
+}
+
+/* 🔥 ADAPTADOR AUTOCOMPLETE BOMBA */
+selecionarBomba(item: any) {
+  const bombaId = item?.bombaId ?? null;
+  this.onBombaChange(bombaId);
+}
+
+// =======================
+// BICO
+// =======================
+
+onBicoChange(value: string | null) {
+  this.bicoSelecionado = value ? String(value) : null;
+}
+
+/* 🔥 ADAPTADOR AUTOCOMPLETE BICO */
+selecionarBico(item: any) {
+  this.onBicoChange(item?.bicoId ?? null);
+}
+
+// =======================
+// DESTINO
+// =======================
+
+onDestinoChange(value: string | null) {
+  this.destinoSelecionado = value ? String(value) : null;
+}
+
+/* 🔥 ADAPTADOR AUTOCOMPLETE DESTINO */
+selecionarDestino(item: any) {
+  this.onDestinoChange(item?.destino ?? null);
+}
+
+// =======================
+// ETAPA
+// =======================
+
+onEtapaChange(value: string | null) {
+  this.etapaSelecionada = value ? String(value) : null;
+}
+
+/* 🔥 ADAPTADOR AUTOCOMPLETE ETAPA */
+selecionarEtapa(item: any) {
+  this.onEtapaChange(item?.id ?? null);
+}
+
+// =======================
+// INSUMO
+// =======================
+
+onInsumoChange(value: string | null) {
+  this.insumoSelecionado = value ? String(value) : null;
+
+  this.etapaSelecionada = null;
+  this.etapas = [];
+  this.aplicacaoSelecionada = null;
+  this.aplicacoes = [];
+  this.aplicacaoHabilitada = false;
+  this.tipoPrevAbast = null;
+
+  this.carregarEtapas();
+  this.carregarAplicacoes();
+}
+
+/* 🔥 ADAPTADOR AUTOCOMPLETE INSUMO */
+selecionarInsumo(item: any) {
+  this.onInsumoChange(item?.insumoId ?? null);
+}
 
     onMotoristaOperadorChange(event: Event) {
       const value = (event as CustomEvent).detail?.value;
@@ -250,6 +290,13 @@ export class AbastecimentoProprioEdicaoPage implements OnInit {
     this.carregarMotoristasOperadores();
     this.carregarColaboradoresFrentista();
     this.carregarEmpreendimentos();
+
+      //  DATA ATUAL AUTOMÁTICA
+    if (!this.abastecimentoId) {
+      const hoje = new Date();
+      this.data = hoje.toISOString().split('T')[0];
+    }
+
     this.abastecimentoService.listarEquipamentos().subscribe({
       next: (eqps) => {
         this.equipamentos = eqps || [];
@@ -260,6 +307,11 @@ export class AbastecimentoProprioEdicaoPage implements OnInit {
       },
     });
   }
+      
+    limparData(event: Event) {
+      event.stopPropagation(); // impede abrir o calendário
+      this.data = null;
+    }
 
   // Carrega todos os empreendimentos disponíveis
   private carregarEmpreendimentos() {
@@ -289,67 +341,81 @@ export class AbastecimentoProprioEdicaoPage implements OnInit {
   private paramMapSubscription: any;
 
   ionViewWillEnter() {
-    // Cancela o subscribe anterior, se houver
-    if (this.paramMapSubscription) {
-      this.paramMapSubscription.unsubscribe();
-    }
-    // Sempre que abrir, zera dados antigos
-    this.limparFormulario();
-    this.dadosAbastecimento = null;
-    this.abastecimentoId = null;
+  if (this.paramMapSubscription) {
+    this.paramMapSubscription.unsubscribe();
+  }
 
-    // Escuta mudanças no paramMap para atualizar o formulário ao trocar o ID
-    this.paramMapSubscription = this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.abastecimentoId = id;
-        // Limpa antes de preencher
-        this.limparFormulario();
-        // Carrega listas dependentes ANTES de preencher o formulário
-        this.carregarBombas();
-        this.abastecimentoService.listarEquipamentos().subscribe({
-          next: (eqps) => {
-            this.equipamentos = eqps || [];
-            this.abastecimentoService.consultarAbastecimentoProprioPorId(id).subscribe({
+  this.paramMapSubscription = this.route.paramMap.subscribe(params => {
+
+    const id = params.get('id');
+
+    // 🔥 LIMPA SEMPRE PRIMEIRO
+    this.limparFormulario();
+
+    if (id) {
+      // ===============================
+      // 🔵 MODO EDIÇÃO
+      // ===============================
+      this.abastecimentoId = id;
+
+      this.carregarBombas();
+
+      this.abastecimentoService.listarEquipamentos().subscribe({
+        next: (eqps) => {
+          this.equipamentos = eqps || [];
+
+          this.abastecimentoService
+            .consultarAbastecimentoProprioPorId(id)
+            .subscribe({
               next: (res: any) => {
                 const dados = Array.isArray(res) ? res[0] : res;
+
                 if (dados) {
-                  // Log detalhado para depuração: comparar com a pesquisa
-                  // ...removido log de debug...
-                  // Carrega listas dependentes da bomba selecionada
+
                   const bombaId = dados.comboioBombaId;
                   const empreendimentoId = dados.emprdId;
                   const insumoId = dados.insumoId;
+
                   const promises: Promise<any>[] = [];
+
                   if (bombaId) {
                     promises.push(
-                      this.abastecimentoService.listarBicos(bombaId).toPromise().then(bicos => { this.bicos = bicos || []; })
+                      this.abastecimentoService.listarBicos(bombaId)
+                        .toPromise()
+                        .then(bicos => this.bicos = bicos || [])
                     );
+
                     promises.push(
-                      this.abastecimentoService.listarDestinos(bombaId).toPromise().then(destinos => { this.destinos = destinos || []; })
+                      this.abastecimentoService.listarDestinos(bombaId)
+                        .toPromise()
+                        .then(destinos => this.destinos = destinos || [])
                     );
+
                     promises.push(
-                      this.abastecimentoService.listarInsumosComboio(bombaId).toPromise().then(insumos => { this.insumos = insumos || []; })
+                      this.abastecimentoService.listarInsumosComboio(bombaId)
+                        .toPromise()
+                        .then(insumos => this.insumos = insumos || [])
                     );
                   }
+
                   if (empreendimentoId && insumoId) {
-                    // ...removido log de debug...
                     promises.push(
-                      this.etapaService.listarEtapas(empreendimentoId, insumoId).toPromise().then(etapas => { this.etapas = etapas || []; })
+                      this.etapaService.listarEtapas(empreendimentoId, insumoId)
+                        .toPromise()
+                        .then(etapas => this.etapas = etapas || [])
                     );
+
                     promises.push(
-                      this.abastecimentoService.listarBlocosPorEmpreendimento(empreendimentoId, insumoId).toPromise().then(blocos => {
-                        // ...removido log de debug...
-                        this.blocos = blocos || [];
-                      })
+                      this.abastecimentoService
+                        .listarBlocosPorEmpreendimento(empreendimentoId, insumoId)
+                        .toPromise()
+                        .then(blocos => this.blocos = blocos || [])
                     );
-                  } else {
-                    // ...removido log de warning...
                   }
-                  // Aguarda todas as listas carregarem antes de preencher o formulário
+
                   Promise.all(promises).then(() => {
                     this.preencherFormularioComDados(dados);
-                    // Força recarregar blocos após preencher dados (corrige select de blocos)
+
                     if (this.empreendimentoSelecionado && this.insumoSelecionado) {
                       this.carregarBlocosPorEmpreendimento(this.empreendimentoSelecionado);
                     }
@@ -360,15 +426,23 @@ export class AbastecimentoProprioEdicaoPage implements OnInit {
                 this.limparFormulario();
               }
             });
-          },
-          error: () => {}
-        });
-      } else {
-        // Sem id: modo novo, limpa tudo
-        this.limparFormulario();
-      }
-    });
-  }
+        }
+      });
+
+    } else {
+      // ===============================
+      // 🟢 MODO NOVO REGISTRO
+      // ===============================
+
+      this.abastecimentoId = null;
+
+      // 🔥 AQUI ESTÁ O SEGREDO
+      const hoje = new Date();
+      this.data = hoje.toISOString().split('T')[0];
+    }
+
+  });
+}
 
   ngOnDestroy() {
     if (this.paramMapSubscription) {
@@ -600,38 +674,46 @@ export class AbastecimentoProprioEdicaoPage implements OnInit {
     }
   }
 
-  onEmpreendimentoChange(event: IonicChangeEvent) {
-    this.empreendimentoSelecionado = String(event.detail.value ?? '');
-    // Limpar seleções dependentes
-    this.etapaSelecionada = null;
-    this.etapas = [];
-    this.blocos = [];
-    this.blocoSelecionado = null;
-    // Carregar blocos
+onEmpreendimentoChange(value: string | null) {
+
+  this.empreendimentoSelecionado = value ? String(value) : null;
+
+  // Limpar seleções dependentes
+  this.etapaSelecionada = null;
+  this.etapas = [];
+  this.blocos = [];
+  this.blocoSelecionado = null;
+
+  // Carregar blocos
+  if (this.empreendimentoSelecionado) {
     this.carregarBlocosPorEmpreendimento(this.empreendimentoSelecionado);
-    // ✨ NOVO: Se já tiver insumo selecionado, recarregar etapas automaticamente
-    if (this.insumoSelecionado && this.empreendimentoSelecionado) {
-      //
-      this.carregarEtapas();
-    }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-  onEquipamentoChange(event: IonicChangeEvent) {
-    this.equipamentoSelecionado = String(event.detail.value ?? '');
-    // ...existing code...
+  // Se já tiver insumo, carregar etapas
+  if (this.insumoSelecionado && this.empreendimentoSelecionado) {
+    this.carregarEtapas();
   }
+}
+
+/* 🔥 ADAPTADOR AUTOCOMPLETE EMPREENDIMENTO */
+selecionarEmpreendimento(item: any) {
+  const empreendimentoId = item?.id ?? null;
+  this.onEmpreendimentoChange(empreendimentoId);
+}
+
+
+
+
+
+
+
+
+
+
+
+onEquipamentoChange(value: string | null) {
+  this.equipamentoSelecionado = value ? String(value) : null;
+}
 
 
 

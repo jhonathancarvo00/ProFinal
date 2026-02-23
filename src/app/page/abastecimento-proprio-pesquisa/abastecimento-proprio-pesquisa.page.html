@@ -1,7 +1,6 @@
 <ion-header class="os-header">
   <ion-toolbar lines="none">
     <div class="os-header-bar">
-      <!-- Casinha -->
       <button class="os-back-btn" (click)="onBack()">
         <img src="../../assets/icon/topoRequest.svg" alt="Voltar" />
       </button>
@@ -16,82 +15,115 @@
 <ion-content class="os-content">
   <div class="os-page">
 
-    <!-- Lista de registros -->
     <ng-container *ngIf="lista && lista.length; else vazio">
 
       <div class="os-card" *ngFor="let item of lista">
-        <!-- Cabeçalho -->
-        <div class="os-card-header">
-          <div class="os-card-os">
-            Equipamento:
-            <ng-container *ngIf="item.codEquipamento && item.codEquipamento.trim()">
-              {{ item.codEquipamento }}<ng-container *ngIf="item.modelo && item.modelo.trim()"> - {{ item.modelo }}</ng-container>
+
+        <!-- DATA -->
+        <div class="os-line os-date">
+          <span class="os-label">Data:</span>
+          <span class="os-value">
+            {{ item.dataAbastecimento | date:'dd/MM/yyyy' }}
+          </span>
+        </div>
+
+        <!-- ORIGEM -->
+        <div class="os-line">
+          <span class="os-label">Origem/Tanque:</span>
+          <span class="os-value">
+            {{ item.comboioBombaCdg || '' }}
+            <ng-container *ngIf="item.comboioBombaDescr">
+              - {{ item.comboioBombaDescr }}
             </ng-container>
-            <ng-container *ngIf="!(item.codEquipamento && item.codEquipamento.trim()) && item.modelo && item.modelo.trim()">
+          </span>
+        </div>
+
+        <!-- EMPREENDIMENTO -->
+        <div class="os-line" *ngIf="item.emprdCod">
+          <span class="os-label">Empreendimento:</span>
+          <span class="os-value">
+            {{ item.emprdCod }} - {{ item.emprDesc }}
+          </span>
+        </div>
+
+        <!-- DESTINO -->
+        <div class="os-line">
+          <span class="os-label">Destino:</span>
+          <span class="os-value">
+            {{ item.destinoTipo }} - {{ item.destinoDesc }}
+          </span>
+        </div>
+
+        <!-- BLOCO EQUIPAMENTO -->
+        <div class="os-equipamento-bloco"
+             *ngIf="item.destinoTipo === 'M'">
+
+          <div class="os-equipamento-titulo">
+            Equipamento
+          </div>
+
+          <div class="os-line">
+            <span class="os-label">Código:</span>
+            <span class="os-value">
+              {{ item.codEquipamento }}
+            </span>
+          </div>
+
+          <div class="os-line">
+            <span class="os-label">Descrição:</span>
+            <span class="os-value">
               {{ item.modelo }}
-            </ng-container>
-            <ng-container *ngIf="!(item.codEquipamento && item.codEquipamento.trim()) && !(item.modelo && item.modelo.trim())">
-              Não informado
-            </ng-container>
+            </span>
           </div>
-          <div class="os-card-status">
-            Placa: {{ item.placa || 'Sem placa' }}
+
+          <!-- Sempre mostra Placa -->
+          <div class="os-line">
+            <span class="os-label">Placa:</span>
+            <span class="os-value">
+              {{ item.placa && item.placa.trim() && item.placa !== 'Sem placa' ? item.placa : '' }}
+            </span>
           </div>
+
         </div>
 
-        <!-- Corpo -->
-        <div class="os-card-body">
-          <div class="os-line">
-            <span class="os-label">Data:</span>
-            <span class="os-value">
-              {{ item.dataAbastecimento | date:'dd/MM/yyyy' }}
-            </span>
-          </div>
-
-          <div class="os-line">
-            <span class="os-label">Quantidade:</span>
-            <span class="os-value">
-              {{ item.quantidade }} L
-            </span>
-          </div>
-
-          <div class="os-line">
-            <span class="os-label">Insumo:</span>
-            <span class="os-value">
-              {{ item.insumoDesc }}
-            </span>
-          </div>
-
-          <div class="os-line">
-            <span class="os-label">Fornecedor/Posto:</span>
-            <span class="os-value">
-              {{ item.fornecedorRazao && item.fornecedorRazao.trim() ? item.fornecedorRazao : 'Não informado' }}
-            </span>
-          </div>
-
-          <div class="os-line" *ngIf="item.numVoucher">
-            <span class="os-label">Voucher:</span>
-            <span class="os-value">
-              {{ item.numVoucher }}
-            </span>
-          </div>
+        <!-- QUANTIDADE -->
+        <div class="os-line os-quantidade">
+          <span class="os-label">Quantidade:</span>
+          <span class="os-value">
+            {{ item.quantidade }} L
+          </span>
         </div>
 
-        <!-- Rodapé -->
+        <!-- INSUMO -->
+        <div class="os-line">
+          <span class="os-label">Insumo:</span>
+          <span class="os-value">
+            {{ item.insumoDesc }}
+          </span>
+        </div>
+
+        <!-- FORNECEDOR -->
+        <div class="os-line">
+          <span class="os-label">Fornecedor/Posto:</span>
+          <span class="os-value">
+            {{ item.fornecedorRazao && item.fornecedorRazao.trim() ? item.fornecedorRazao : 'Não informado' }}
+          </span>
+        </div>
+
+        <!-- BOTÃO -->
         <div class="os-card-footer">
           <button
             type="button"
             class="os-details-btn"
-            (click)="verDetalhes(item)"
-          >
+            (click)="verDetalhes(item)">
             VER DETALHES
           </button>
         </div>
+
       </div>
 
     </ng-container>
 
-    <!-- Quando não tiver nada -->
     <ng-template #vazio>
       <div class="os-empty">
         Nenhum abastecimento encontrado.

@@ -107,3 +107,6 @@ export class AbastecimentoProprioPesquisaPage implements OnInit {
     this.router.navigate(['/tabs/abastecimento-proprio-edicao', item.abastecimentoId]);
   }
 }
+
+
+

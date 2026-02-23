@@ -1,14 +1,12 @@
 <ion-header class="os-header">
   <ion-toolbar lines="none">
     <div class="os-header-bar">
-      <!-- casinha -->
       <button class="os-back-btn" (click)="onBack()">
         <img src="../../assets/icon/topoRequest.svg" alt="Voltar" />
       </button>
 
       <h1 class="os-title">Abastecimento Próprio</h1>
 
-      <!-- botão NOVO -->
       <button class="os-new-btn" (click)="goNovo()">
         NOVO
       </button>
@@ -23,68 +21,92 @@
       <!-- Origem / Tanque -->
       <div class="os-field">
         <label class="os-label">Origem / Tanque</label>
-        <ion-input
-          class="os-input"
-          type="text"
-          [(ngModel)]="origemTanque">
-        </ion-input>
+<app-autocomplete
+  [lista]="origensLista"
+  campoDescricao="descricao"
+  [valorSelecionado]="origemTanqueId"
+  (selecionado)="onOrigemSelecionado($event)">
+</app-autocomplete>
       </div>
 
       <!-- Equipamento -->
       <div class="os-field">
         <label class="os-label">Equipamento</label>
-        <ion-input
-          class="os-input"
-          type="text"
-          [(ngModel)]="equipamento">
-        </ion-input>
+<app-autocomplete
+  [lista]="equipamentosLista"
+  campoDescricao="descricao"
+  [valorSelecionado]="equipamentoId"
+  (selecionado)="onEquipamentoSelecionado($event)">
+</app-autocomplete>
       </div>
 
       <!-- Data Inicial -->
-      <div class="os-field">
-        <label class="os-label">Data Inicial</label>
-        <div
-          class="os-date-input"
-          (click)="openCalendar($event, 'dataInicial')">
+<div class="os-field">
+  <label class="os-label">Data Inicial</label>
 
-          <ion-input
-            class="os-input os-date-display"
-            readonly
-            placeholder="dd/mm/aaaa"
-            [value]="formatDate(dataInicial)">
-          </ion-input>
+  <div class="os-date-input">
 
-          <button
-            type="button"
-            class="os-date-btn"
-            (click)="openCalendar($event, 'dataInicial'); $event.stopPropagation()">
-            <ion-icon name="calendar-clear-outline"></ion-icon>
-          </button>
-        </div>
-      </div>
+    <ion-input
+      class="os-input os-date-display"
+      readonly
+      placeholder="dd/mm/aaaa"
+      [value]="formatDate(dataInicial)"
+      (click)="openCalendar($event, 'dataInicial')">
+    </ion-input>
+
+    <!-- ❌ BOTÃO LIMPAR -->
+    <button
+      *ngIf="dataInicial"
+      type="button"
+      class="os-date-clear"
+      (click)="limparData('dataInicial', $event)">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+
+    <!-- 📅 BOTÃO CALENDÁRIO -->
+    <button
+      type="button"
+      class="os-date-btn"
+      (click)="openCalendar($event, 'dataInicial')">
+      <ion-icon name="calendar-clear-outline"></ion-icon>
+    </button>
+
+  </div>
+</div>
 
       <!-- Data Final -->
-      <div class="os-field">
-        <label class="os-label">Data Final</label>
-        <div
-          class="os-date-input"
-          (click)="openCalendar($event, 'dataFinal')">
+<div class="os-field">
+  <label class="os-label">Data Final</label>
 
-          <ion-input
-            class="os-input os-date-display"
-            readonly
-            placeholder="dd/mm/aaaa"
-            [value]="formatDate(dataFinal)">
-          </ion-input>
+  <div class="os-date-input">
 
-          <button
-            type="button"
-            class="os-date-btn"
-            (click)="openCalendar($event, 'dataFinal'); $event.stopPropagation()">
-            <ion-icon name="calendar-clear-outline"></ion-icon>
-          </button>
-        </div>
-      </div>
+    <ion-input
+      class="os-input os-date-display"
+      readonly
+      placeholder="dd/mm/aaaa"
+      [value]="formatDate(dataFinal)"
+      (click)="openCalendar($event, 'dataFinal')">
+    </ion-input>
+
+    <!-- ❌ BOTÃO LIMPAR -->
+    <button
+      *ngIf="dataFinal"
+      type="button"
+      class="os-date-clear"
+      (click)="limparData('dataFinal', $event)">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+
+    <!-- 📅 BOTÃO CALENDÁRIO -->
+    <button
+      type="button"
+      class="os-date-btn"
+      (click)="openCalendar($event, 'dataFinal')">
+      <ion-icon name="calendar-clear-outline"></ion-icon>
+    </button>
+
+  </div>
+</div>
 
       <!-- Botão Pesquisar -->
       <div class="os-actions">

@@ -1,4 +1,5 @@
-/* HEADER igual às telas de OS */
+/* ================= HEADER PADRÃO ================= */
+
 .os-header,
 .os-header ion-toolbar {
   --background: #f4f6f9 !important;
@@ -38,7 +39,8 @@
   color: #2d6fb1;
 }
 
-/* Fundo da página */
+/* ================= FUNDO ================= */
+
 .os-content {
   --background: #f4f6f9;
 }
@@ -47,48 +49,25 @@
   padding: 12px;
 }
 
-/* Card de resultado – mesmo “tamanho visual” da OS Pesquisa */
+/* ================= CARD ================= */
+
 .os-card {
   background: #ffffff;
   border-radius: 14px;
   box-shadow: 0 7px 16px rgba(0, 0, 0, 0.08);
-  padding: 18px 16px 22px;
+  padding: 22px 18px 24px;
   margin-bottom: 14px;
-
-  width: 100%;
   max-width: 420px;
   margin-left: auto;
   margin-right: auto;
-}
-
-/* Cabeçalho do card */
-.os-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.os-card-os {
-  font-size: 12px;
-  font-weight: 700;
-  color: #333;
-}
-
-.os-card-status {
-  font-size: 12px;
-  font-weight: 600;
-  color: #2d6fb1;
-}
-
-/* Corpo do card */
-.os-card-body {
   font-size: 14px;
-  color: #444;
 }
+
+/* ================= LINHAS ================= */
 
 .os-line {
-  margin-bottom: 4px;
+  margin-bottom: 10px;
+  line-height: 1.5;
 }
 
 .os-label {
@@ -99,35 +78,51 @@
   margin-left: 4px;
 }
 
-/* Rodapé do card */
+.os-date {
+  margin-bottom: 10px;
+}
+
+.os-quantidade {
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+/* ================= BLOCO EQUIPAMENTO ================= */
+
+.os-equipamento-bloco {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e6edf7;
+}
+
+.os-equipamento-titulo {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+/* ================= BOTÃO ================= */
+
 .os-card-footer {
-  margin-top: 12px;
+  margin-top: 14px;
   display: flex;
   justify-content: center;
 }
 
-/* Botão VER DETALHES – igual ao da OS Pesquisa (mais largo e “pill”) */
 .os-details-btn {
-  /* se for ion-button */
-  --background: #e4f1ff;
-  --border-radius: 22px;
-  --color: #2d6fb1;
-
-  /* fallback se for <button> normal */
   background: #e4f1ff;
   color: #2d6fb1;
   border: none;
   border-radius: 22px;
-
   width: 70%;
   max-width: 260px;
   height: 36px;
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.5px;
 }
 
-/* Mensagem quando não tiver dados */
+/* ================= VAZIO ================= */
+
 .os-empty {
   text-align: center;
   font-size: 13px;

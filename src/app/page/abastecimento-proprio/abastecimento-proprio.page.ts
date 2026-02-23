@@ -3,43 +3,76 @@ import { Router } from '@angular/router';
 import { PopoverController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { CalendarPopoverComponent } from '../../components/calendar-popover/calendar-popover.component';
+import { AbastecimentoService } from '../../services/abastecimento.service';
 
 @Component({
-  standalone: false,
   selector: 'app-abastecimento-proprio',
   templateUrl: './abastecimento-proprio.page.html',
   styleUrls: ['./abastecimento-proprio.page.scss'],
+  standalone: false
 })
 export class AbastecimentoProprioPage implements OnInit {
 
-  // filtros da tela
-  origemTanque = '';
-  equipamento = '';
+  // LISTAS
+  origensLista: any[] = [];
+  equipamentosLista: any[] = [];
+
+  // IDS SELECIONADOS
+  origemTanqueId: string | null = null;
+  equipamentoId: string | null = null;
+
+  // DATAS
   dataInicial: string | null = null;
   dataFinal: string | null = null;
 
   constructor(
     private router: Router,
-    private popoverCtrl: PopoverController
+    private popoverCtrl: PopoverController,
+    private abastecimentoService: AbastecimentoService
   ) {}
 
-  ngOnInit() {}
-
-  // casinha
-  onBack() {
-    this.router.navigate(['/tabs/abastecimento']);
+  ngOnInit() {
+    this.carregarListas();
   }
 
-  // botão NOVO
-  goNovo() {
-    // Adiciona timestamp para forçar nova instância limpa do componente
-    this.router.navigate(['/tabs/abastecimento-proprio-edicao'], {
-      queryParams: { t: Date.now() }
-    });
+carregarListas() {
+
+  // 🔥 ORIGEM / TANQUE (BOMBAS)
+  this.abastecimentoService.listarBombas().subscribe({
+    next: dados => {
+      this.origensLista = (dados ?? []).map(b => ({
+        id: b.bombaId,
+        descricao: b.bombaDescricao || b.bombaCod || ''
+      }));
+    },
+    error: () => this.origensLista = []
+  });
+
+  // 🔥 EQUIPAMENTOS
+  this.abastecimentoService.listarEquipamentosMobile().subscribe({
+    next: dados => this.equipamentosLista = dados ?? [],
+    error: () => this.equipamentosLista = []
+  });
+}
+
+  // AUTOCOMPLETE
+  onOrigemSelecionado(item: any) {
+    this.origemTanqueId = item?.id ?? null;
   }
 
-  // abre o calendário para o campo informado
+  onEquipamentoSelecionado(item: any) {
+    this.equipamentoId = item?.id ?? null;
+  }
+
+  // LIMPAR DATA
+  limparData(campo: 'dataInicial' | 'dataFinal', event: Event) {
+    event.stopPropagation();
+    this[campo] = null;
+  }
+
+  // CALENDÁRIO
   async openCalendar(event: any, campo: 'dataInicial' | 'dataFinal') {
+
     const popover = await this.popoverCtrl.create({
       component: CalendarPopoverComponent,
       event,
@@ -52,12 +85,8 @@ export class AbastecimentoProprioPage implements OnInit {
 
     const { data } = await popover.onDidDismiss();
 
-    if (data && data.date) {
-      if (campo === 'dataInicial') {
-        this.dataInicial = data.date;
-      } else {
-        this.dataFinal = data.date;
-      }
+    if (data?.date) {
+      this[campo] = data.date;
     }
   }
 
@@ -70,11 +99,12 @@ export class AbastecimentoProprioPage implements OnInit {
     }
   }
 
-  // botão PESQUISAR
+  // PESQUISAR
   pesquisar() {
+
     const filtros = {
-      origemTanque: this.origemTanque,
-      equipamento: this.equipamento,
+      origemTanqueId: this.origemTanqueId,
+      equipamentoId: this.equipamentoId,
       dataInicial: this.dataInicial,
       dataFinal: this.dataFinal,
     };
@@ -83,5 +113,15 @@ export class AbastecimentoProprioPage implements OnInit {
       ['/tabs/abastecimento-proprio-pesquisa'],
       { queryParams: filtros }
     );
+  }
+
+  onBack() {
+    this.router.navigate(['/tabs/abastecimento']);
+  }
+
+  goNovo() {
+    this.router.navigate(['/tabs/abastecimento-proprio-edicao'], {
+      queryParams: { t: Date.now() }
+    });
   }
 }

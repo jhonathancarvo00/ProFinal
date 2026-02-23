@@ -148,6 +148,12 @@ export interface AbastecimentoConsulta {
   // Outros
   entidade?: number;
   codAbastecimentoExterno?: string;
+
+  // Destino
+  destino?: string;
+  destinoTipo?: string;
+  destinoDesc?: string;
+  destinoid?: string;
 }
 
 @Injectable({

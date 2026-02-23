@@ -64,6 +64,10 @@
   margin-bottom: 12px;
 }
 
+.abp-field app-autocomplete {
+  margin-top: 0 !important;
+}
+
 .abp-label {
   display: block;
   margin-bottom: 4px;
@@ -73,7 +77,9 @@
 }
 
 .abp-input {
-  --background: #f9fbff;
+  --background: #ffffff;
+  background: #ffffff;
+
   --padding-start: 10px;
   --padding-end: 10px;
   --min-height: 40px;
@@ -83,11 +89,15 @@
   border: 1px solid #dde5f2;
   font-size: 13px;
 
-  /* foco azul igual as outras telas */
   --highlight-color-focused: #2d6fb1;
   --highlight-color: #2d6fb1;
   --highlight-color-valid: #2d6fb1;
   --highlight-color-invalid: #2d6fb1;
+}
+
+ion-input.abp-input {
+  --background: #ffffff !important;
+  background: #ffffff !important;
 }
 
 .abp-input.ion-focused {
@@ -148,7 +158,7 @@ ion-select.abp-select::part(text) {
 
 .abp-date-input .abp-input {
   --padding-start: 12px;
-  --padding-end: 40px; // espaço pro ícone
+  --padding-end: 40px;
 }
 
 .abp-date-btn {
@@ -173,6 +183,25 @@ ion-select.abp-select::part(text) {
   color: #a0b2cf;
 }
 
+.abp-date-clear {
+  position: absolute;
+  right: 42px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid #dde5f2;
+  background: #fff;
+  font-size: 13px;
+  color: #9aa8c5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 3;
+}
+
 /* Botão confirmar */
 .abp-actions {
   margin-top: 18px;
@@ -189,26 +218,20 @@ ion-select.abp-select::part(text) {
   letter-spacing: 0.8px;
   font-size: 13px;
 }
-/* Força o texto do ion-select a ficar visível */
-ion-select.abp-select {
-  max-width: 100%;
-  width: 100%;
-  min-width: 0;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  --placeholder-color: #9a9a9a;
-  --placeholder-opacity: 1;
+
+/* ============================= */
+/* 🔥 AJUSTE FINAL AUTOCOMPLETE */
+/* ============================= */
+
+.abp-field app-autocomplete .os-input {
+  border-radius: 8px !important;   /* Igual aos outros campos */
+  border: 1px solid #dde5f2 !important;
+  box-shadow: none !important;
 }
 
-/* Parte interna do texto selecionado dentro do ion-select */
-ion-select.abp-select::part(text) {
-    max-width: 100%;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-  color: #333 !important;
-  opacity: 1 !important;
+.abp-field app-autocomplete .os-input:focus {
+  border-color: #2d6fb1 !important; /* Foco azul padrão do sistema */
+  border-width: 1px !important;
 }
 
 /* Detalhes do bloco */
@@ -233,3 +256,34 @@ ion-select.abp-select::part(text) {
   color: #1a1a1a !important;
   font-weight: 600;
 }
+
+/* ===================================== */
+/* 🔥 INPUT PADRÃO POSTOS (LIMPO) */
+/* ===================================== */
+
+.abp-input-clean {
+  --background: #ffffff !important;
+  background: #ffffff !important;
+
+  border: 1px solid #dde5f2 !important;
+  border-radius: 8px !important;
+
+  --highlight-color-focused: transparent !important;
+  --highlight-color: transparent !important;
+
+  box-shadow: none !important;
+}
+
+/* Remove linha interna do Ionic */
+.abp-input-clean::part(native) {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Foco igual tela Postos */
+.abp-input-clean.ion-focused {
+  border: 1px solid #000 !important;
+}
+
+
