@@ -145,9 +145,16 @@ selecionarBico(item: any) {
 // =======================
 // DESTINO
 // =======================
-
 onDestinoChange(value: string | null) {
+
   this.destinoSelecionado = value ? String(value) : null;
+
+  const destinoObj = this.destinos.find(d => d.destino === this.destinoSelecionado);
+
+  // 🔥 Se não for destino tipo Equipamento, limpar equipamento
+  if (destinoObj && destinoObj.destinoTipo !== 'M') {
+    this.equipamentoSelecionado = null;
+  }
 }
 
 /* 🔥 ADAPTADOR AUTOCOMPLETE DESTINO */
@@ -190,7 +197,26 @@ onInsumoChange(value: string | null) {
 selecionarInsumo(item: any) {
   this.onInsumoChange(item?.insumoId ?? null);
 }
-
+/* 🔥 ADAPTADOR AUTOCOMPLETE TROCA/REPOSIÇÃO */
+selecionarTipoPrevAbast(item: any) {
+  this.tipoPrevAbast = item?.id ?? null;
+}
+/* 🔥 ADAPTADOR AUTOCOMPLETE APLICAÇÃO */
+selecionarAplicacao(item: any) {
+  this.aplicacaoSelecionada = item?.id ?? null;
+}
+/* 🔥 ADAPTADOR AUTOCOMPLETE MOTORISTA */
+selecionarMotoristaOperador(item: any) {
+  this.motoristaOperadorSelecionado = item?.fornId ?? null;
+}
+/* 🔥 ADAPTADOR AUTOCOMPLETE FRENTISTA */
+selecionarColaboradorFrentista(item: any) {
+  this.colaboradorFrentistaSelecionado = item?.id ?? null;
+}
+/* 🔥 ADAPTADOR AUTOCOMPLETE BLOCO */
+selecionarBloco(item: any) {
+  this.blocoSelecionado = item?.id ?? null;
+}
     onMotoristaOperadorChange(event: Event) {
       const value = (event as CustomEvent).detail?.value;
       this.motoristaOperadorSelecionado = value as typeof this.motoristaOperadorSelecionado;
@@ -223,6 +249,10 @@ selecionarInsumo(item: any) {
   motoristaOperadorSelecionado: string | { fornId: string } | null = null;
 
   tipoPrevAbast: string | null = null;
+  tiposPrevAbast = [
+  { id: 'T', descricao: 'Troca' },
+  { id: 'R', descricao: 'Reposição' }
+];
   aplicacaoSelecionada: string | null = null;
   aplicacoes: AplicacaoDto[] = [];
   aplicacaoHabilitada = false;
@@ -419,6 +449,9 @@ selecionarInsumo(item: any) {
                     if (this.empreendimentoSelecionado && this.insumoSelecionado) {
                       this.carregarBlocosPorEmpreendimento(this.empreendimentoSelecionado);
                     }
+                    if (this.equipamentoSelecionado && this.insumoSelecionado) {
+    this.carregarAplicacoes()
+                    }
                   });
                 }
               },
@@ -503,14 +536,42 @@ selecionarInsumo(item: any) {
       this.empreendimentoSelecionado = null;
     }
     // Bomba
-    const bombaRaw = this.getItemValue(dados, ['comboioBombaId', 'bombaId', 'idBomba']);
-    this.bombaSelecionada = (bombaRaw && bombaRaw !== guidZerado) ? bombaRaw : null;
-    // Bico
-    const bicoRaw = this.getItemValue(dados, ['bicoId', 'idBico', 'BicoId']);
-    this.bicoSelecionado = (bicoRaw && bicoRaw !== guidZerado) ? bicoRaw : null;
-    // Insumo
-    const insumoRaw = this.getItemValue(dados, ['insumoId', 'idInsumo', 'InsumoId']);
-    this.insumoSelecionado = (insumoRaw && insumoRaw !== guidZerado) ? insumoRaw : null;
+const bombaRaw = this.getItemValue(dados, ['comboioBombaId', 'bombaId', 'idBomba']);
+this.bombaSelecionada = (bombaRaw && bombaRaw !== guidZerado) ? bombaRaw : null;
+
+/* 🔥 IMPORTANTE: carregar dependências da bomba no modo edição */
+if (this.bombaSelecionada) {
+
+  // Carregar BICOS
+  this.abastecimentoService.listarBicos(this.bombaSelecionada).subscribe({
+    next: (bicos) => {
+      this.bicos = bicos || [];
+    },
+    error: () => {
+      this.bicos = [];
+    }
+  });
+
+  // Carregar DESTINOS
+  this.abastecimentoService.listarDestinos(this.bombaSelecionada).subscribe({
+    next: (destinos) => {
+      this.destinos = destinos || [];
+    },
+    error: () => {
+      this.destinos = [];
+    }
+  });
+
+  // 🔥 CARREGAR INSUMOS (o que estava faltando)
+  this.abastecimentoService.listarInsumosComboio(this.bombaSelecionada).subscribe({
+    next: (insumos) => {
+      this.insumos = insumos || [];
+    },
+    error: () => {
+      this.insumos = [];
+    }
+  });
+}
     // Etapa
     const etapaRaw = this.getItemValue(dados, ['etapaId', 'idEtapa', 'EtapaId']);
     this.etapaSelecionada = (etapaRaw && etapaRaw !== guidZerado) ? etapaRaw : null;
@@ -576,8 +637,8 @@ selecionarInsumo(item: any) {
     // Log para depuração
     // ...removido log de preenchimento...
     // fechamento correto da função
-  }
 
+}
   /**
    * Limpa todos os campos do formulário para criar um novo abastecimento
    */
@@ -712,7 +773,24 @@ selecionarEmpreendimento(item: any) {
 
 
 onEquipamentoChange(value: string | null) {
+
   this.equipamentoSelecionado = value ? String(value) : null;
+
+  if (this.equipamentoSelecionado) {
+
+    // 🔥 Setar destino automaticamente para "Equipamento"
+    const destinoEquip = this.destinos.find(d => d.destinoTipo === 'M');
+
+    if (destinoEquip) {
+      this.destinoSelecionado = destinoEquip.destino;
+    }
+
+  }
+
+  // Se tiver insumo, continua carregando aplicação
+  if (this.insumoSelecionado) {
+    this.carregarAplicacoes();
+  }
 }
 
 
@@ -746,34 +824,30 @@ onEquipamentoChange(value: string | null) {
     });
   }
 
-  // ✨ Método auxiliar para carregar aplicações
-  private carregarAplicacoes() {
-    if (!this.equipamentoSelecionado || !this.insumoSelecionado) {
-      //
-      return;
-    }
+private carregarAplicacoes() {
 
-    //
+  if (!this.equipamentoSelecionado || !this.insumoSelecionado) {
+    this.aplicacoes = [];
+    this.aplicacaoHabilitada = false;
+    return;
+  }
 
-    this.abastecimentoService.consultarAplicacaoPrevEquipInsumo(this.equipamentoSelecionado, this.insumoSelecionado).subscribe({
+  this.abastecimentoService
+    .consultarAplicacaoPrevEquipInsumo(
+      this.equipamentoSelecionado,
+      this.insumoSelecionado
+    )
+    .subscribe({
       next: (aplics) => {
         this.aplicacoes = aplics || [];
         this.aplicacaoHabilitada = this.aplicacoes.length > 0;
-
-        //
-        if (this.aplicacoes.length === 0) {
-          //
-        } else {
-          //
-        }
       },
       error: () => {
-        //
-        this.aplicacaoHabilitada = false;
         this.aplicacoes = [];
-      },
+        this.aplicacaoHabilitada = false;
+      }
     });
-  }
+}
 
 
 
@@ -863,30 +937,28 @@ onEquipamentoChange(value: string | null) {
     });
   }
 
-  onQuantidadeChange(event: Event) {
-    const ce = event as CustomEvent<{ value?: unknown }>;
-    const value = ce.detail?.value ?? (event.target as HTMLInputElement | null)?.value ?? null;
-    this.quantidade = value !== null && value !== '' ? Number(value) : null;
-    // ...removido log de quantidade...
-    this.logPayloadPreview();
-  }
+onQuantidadeChange(event: Event) {
+  const value = (event.target as HTMLInputElement).value;
+  this.quantidade = value ? Number(value) : null;
+}
 
-  onNumBombaInicialChange(event: Event) {
-    const ce = event as CustomEvent<{ value?: unknown }>;
-    const value = ce.detail?.value ?? (event.target as HTMLInputElement | null)?.value ?? null;
-    this.numBombaInicial = value !== null && value !== '' ? Number(value) : null;
-    // ...removido log de bomba inicial...
-    this.logPayloadPreview();
-  }
+onNumBombaInicialChange(event: Event) {
+  const value = (event.target as HTMLInputElement).value;
+  this.numBombaInicial = value ? Number(value) : null;
+}
 
-  onNumBombaFinalChange(event: Event) {
-    const ce = event as CustomEvent<{ value?: unknown }>;
-    const value = ce.detail?.value ?? (event.target as HTMLInputElement | null)?.value ?? null;
-    this.numBombaFinal = value !== null && value !== '' ? Number(value) : null;
-    // ...removido log de bomba final...
-    this.logPayloadPreview();
-  }
-
+onNumBombaFinalChange(event: Event) {
+  const value = (event.target as HTMLInputElement).value;
+  this.numBombaFinal = value ? Number(value) : null;
+}
+onHoraChange(event: Event) {
+  const value = (event.target as HTMLInputElement).value;
+  this.horaAbastecimento = value || null;
+}
+onObservacaoChange(event: Event) {
+  const value = (event.target as HTMLTextAreaElement).value;
+  this.observacao = value || '';
+}
   confirmar() {
 
     // Validação extra: se for edição, o ID deve estar presente
