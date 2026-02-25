@@ -82,6 +82,7 @@ export class OrdemServicoEdicaoPage implements OnInit {
   dataAbertura: string | null = null;
   dataConclusao: string | null = null;
 
+  //status: string = '';
   //NOVOS CAMPOS
   defeitosConstatados: string = '';
   causasProvaveis: string = '';
@@ -104,13 +105,12 @@ export class OrdemServicoEdicaoPage implements OnInit {
   manutentoresLista: ItemComId[] = [];
 
   // Status fixo (exemplo)
-  statusLista = [
-    { valor: 1, descricao: 'Aberto' },
-    { valor: 2, descricao: 'Em andamento' },
-    { valor: 3, descricao: 'Concluído' },
-    { valor: 4, descricao: 'Cancelado' },
-  ];
-
+statusLista = [
+  { valor: 1, descricao: 'Aberta' },
+  { valor: 2, descricao: 'Em andamento' },
+  { valor: 3, descricao: 'Finalizada' },
+  { valor: 4, descricao: 'Cancelada' },
+];
   carregando = false;
 
   private getFotoCacheKeyById(osId: string) {
@@ -287,6 +287,7 @@ fecharDropdownAoClicarFora(event: Event) {
       this.causaIntervencao = '';
       this.operadorMotorista = '';
       this.manutentor = '';
+      //this.statusCodigo = 1;
       this.statusCodigo = null;
       this.dataAbertura = new Date().toISOString(); // ← data atual
       this.dataConclusao = null;
@@ -730,6 +731,9 @@ fecharDropdownAoClicarFora(event: Event) {
     this.ordemService.listarTiposOs().subscribe({
       next: (lista) => { this.tiposOsLista = lista || []; checkDone(); },
     });
+
+    console.log('TIPOS LOOKUP REAL:', JSON.stringify(this.tiposOsLista, null, 2));
+
     this.ordemService.listarCausasIntervencao().subscribe({
       next: (lista) => { this.causasIntervencaoLista = lista || []; checkDone(); },
     });
@@ -1424,10 +1428,23 @@ onDigitarStatus() {
 private carregarOsCompleta(osId: string) {
   if (!osId || osId.length !== 36) return;
 
+  
+
   this.ordemService.buscarOSPorId(osId).subscribe({
     next: (res: any) => {
       const osApi = Array.isArray(res) ? res[0] : res;
       if (!osApi) return;
+
+
+console.log('OS API COMPLETA >>>', osApi);
+
+       // 👇 COLOQUE AQUI
+    console.log('TIPOS LISTA:', this.tiposOsLista);
+    console.log('OS API TIPO CAMPOS:', {
+      TipoServicoId: osApi.TipoServicoId,
+      tpServCod: osApi.tpServCod,
+      tpServDescricao: osApi.tpServDescricao
+    });
 
       // Log detalhado para debug
       console.log('OS API COMPLETA:', osApi);
@@ -1478,17 +1495,49 @@ private carregarOsCompleta(osId: string) {
       // ===============================
       // 🔎 STATUS
       // ===============================
-      let status = null;
-      const statusCodRaw = osApi.statusCod ?? osApi.Status;
-      const statusCod = Number(statusCodRaw);
-      // Se for null, undefined ou vazio, não exibe nada
-      if (statusCodRaw === null || statusCodRaw === undefined || statusCodRaw === '') {
-        this.statusCodigo = null;
-      } else {
-        status = this.statusLista.find((s: any) => String(s.valor ?? s.codigo ?? s.id) === String(statusCod));
-        this.statusCodigo = status ? status.valor : null;
-      }
+      // ===============================
+// 🔎 STATUS
+// ===============================
 
+// ===============================
+// 🔎 STATUS
+// ===============================
+
+// ===============================
+// 🔎 STATUS
+// ===============================
+
+// ===============================
+// 🔎 STATUS (CORRIGIDO DEFINITIVO)
+// ===============================
+// ===============================
+// 🔎 STATUS (CORREÇÃO FINAL)
+// ===============================
+
+const statusCodigoApi =
+  osApi.statusCod ??
+  osApi.Status ??
+  osApi.status ??
+  osApi.statusCodigo ??
+  null;
+
+// ⚠️ NÃO usar "if (statusCodigoApi)" porque 0 é válido
+
+if (statusCodigoApi !== null && statusCodigoApi !== undefined) {
+
+  const statusEncontrado = this.statusLista.find((s: any) =>
+    String(s.valor) === String(statusCodigoApi)
+  );
+
+  if (statusEncontrado) {
+    this.statusCodigo = statusEncontrado.valor;
+  } else {
+    this.statusCodigo = Number(statusCodigoApi);
+  }
+
+} else {
+  this.statusCodigo = null;
+}
       // ===============================
       // 🔎 EMPREENDIMENTO
       // ===============================
@@ -1500,82 +1549,100 @@ private carregarOsCompleta(osId: string) {
       // ===============================
       // 🔎 CLASSIFICAÇÃO
       // ===============================
-      let classificacao = null;
-      const classifId = String(
-        osApi.classifCod ?? osApi.ClassificacaoId ?? osApi.classifId ?? ''
-      );
-      if (
-        classifId &&
-        classifId !== '00000000-0000-0000-0000-000000000000' &&
-        classifId !== '0' &&
-        classifId !== '' &&
-        classifId !== null
-      ) {
-        classificacao = this.classificacoesLista.find((c: any) =>
-          String(c.codigo ?? c.classifCod ?? c.ClassificacaoId ?? c.classifId) === classifId
-        );
-        this.classificacao = classificacao?.id || classifId;
-      } else {
-        this.classificacao = '';
-      }
+   // ===============================
+// 🔎 CLASSIFICAÇÃO (CORRETO)
+// ===============================
+
+const classifId =
+  osApi.ClassificacaoId ??
+  osApi.classifCod ??
+  osApi.classifId ??
+  null;
+
+if (classifId && this.classificacoesLista?.length) {
+
+  const classificacaoEncontrada = this.classificacoesLista.find((c: any) =>
+    String(c.id) === String(classifId) ||
+    String(c.ClassificacaoId) === String(classifId) ||
+    String(c.codigo) === String(classifId)
+  );
+
+  this.classificacao = classificacaoEncontrada
+    ? String(classificacaoEncontrada.id)
+    : String(classifId);
+
+} else {
+  this.classificacao = '';
+}
+
+
 
       // ===============================
-      // 🔎 TIPO
-      // ===============================
-      let tipo = null;
-      const tipoId = String(
-        osApi.tpServCod ?? osApi.TipoServicoId ?? osApi.tpServcod ?? ''
-      );
-      const tipoDescricao = osApi.tpServDescricao ?? osApi.tpServdescricao ?? osApi.TipoServicoDescricao ?? '';
-      if (
-        tipoId &&
-        tipoId !== '00000000-0000-0000-0000-000000000000' &&
-        tipoId !== '0' &&
-        tipoId !== '' &&
-        tipoId !== null
-      ) {
-        tipo = this.tiposOsLista.find((t: any) =>
-          String(t.codigo ?? t.tpServCod ?? t.TipoServicoId ?? t.tpServcod) === tipoId
-        );
-        if (tipo) {
-          // O valor salvo deve ser o id real do tipo (ex: GUID ou código), nunca apenas o número
-          this.tipo = tipo.id || tipo.codigo || tipoId;
-          if (tipoDescricao) {
-            tipo.descricao = `${tipoId} - ${tipoDescricao}`;
-          }
-        } else {
-          // Se não encontrar, só adiciona se não existir nenhum item com esse id
-          this.tipo = tipoId;
-          const jaExiste = this.tiposOsLista.some(t => String(t.id) === String(tipoId));
-          if (!jaExiste && tipoDescricao) {
-            this.tiposOsLista.push({ id: tipoId, descricao: `${tipoId} - ${tipoDescricao}` });
-          }
-        }
-        this.tipoDescricao = tipoDescricao || '';
-      } else {
-        this.tipo = '';
-        this.tipoDescricao = '';
-      }
+// 🔎 TIPO (CORRETO)
+// ===============================
 
-      // ===============================
-      // 🔎 CAUSA INTERVENÇÃO
-      // ===============================
-      let causa = null;
-      const causaId = String(osApi.causasId ?? osApi.CausasId ?? '');
-      if (causaId && causaId !== '00000000-0000-0000-0000-000000000000') {
-        causa = this.causasIntervencaoLista.find((c: any) => String(c.id ?? c.codigo ?? c.CausaIntervencao) === causaId);
-      }
-      this.causaIntervencao = causa?.id || '';
+// ===============================
+// ===============================
+// 🔎 TIPO (ULTRA ROBUSTO CORRIGIDO)
+// ===============================
 
-      // ===============================
-      // 🔎 OPERADOR
-      // ===============================
-      let operador = null;
-      const colaboradorId = String(osApi.colaboradorCod ?? osApi.colaColaboradorId ?? '');
-      if (colaboradorId && colaboradorId !== '00000000-0000-0000-0000-000000000000') {
-        operador = this.motoristasLista.find((m: any) => String(m.fornCod ?? '').trim() === colaboradorId.trim());
-      }
-      this.operadorMotorista = operador ? String(operador.id) : '';
+console.log('TIPO CAMPOS RECEBIDOS:', {
+  TipoServicoId: osApi.TipoServicoId,
+  tpServCod: osApi.tpServCod,
+  tipoId: osApi.tipoId,
+  tipoServico: osApi.tipoServico,
+  tpServDescricao: osApi.tpServDescricao
+});
+
+const tipoValor =
+  osApi.TipoServicoId ??
+  osApi.tpServCod ??
+  osApi.tipoId ??
+  osApi.tipoServico ??
+  null;
+
+// 🔥 NÃO DEPENDE MAIS DA LISTA ESTAR CARREGADA
+this.tipo = tipoValor ? String(tipoValor) : '';
+
+
+// ===============================
+// 🔎 CAUSA INTERVENÇÃO
+// ===============================
+
+let causa = null;
+const causaId = String(osApi.causasId ?? osApi.CausasId ?? '');
+
+if (causaId && causaId !== '00000000-0000-0000-0000-000000000000') {
+  causa = this.causasIntervencaoLista.find((c: any) =>
+    String(c.id ?? c.codigo ?? c.CausaIntervencao) === causaId
+  );
+}
+
+this.causaIntervencao = causa?.id || '';
+
+
+// ===============================
+// 🔎 OPERADOR / MOTORISTA (ULTRA ROBUSTO CORRIGIDO)
+// ===============================
+
+console.log('MOTORISTA CAMPOS RECEBIDOS:', {
+  MotoristaOperadorId: osApi.MotoristaOperadorId,
+  colaboradorCod: osApi.colaboradorCod,
+  colaboradorId: osApi.colaboradorId,
+  operadorId: osApi.operadorId,
+  fornId: osApi.fornId
+});
+
+const motoristaValor =
+  osApi.MotoristaOperadorId ??
+  osApi.colaboradorCod ??
+  osApi.colaboradorId ??
+  osApi.operadorId ??
+  osApi.fornId ??
+  null;
+
+// 🔥 NÃO DEPENDE MAIS DA LISTA ESTAR CARREGADA
+this.operadorMotorista = motoristaValor ? String(motoristaValor) : '';
 
       // ===============================
       // 🔎 MANUTENTOR
@@ -1627,7 +1694,8 @@ private carregarOsCompleta(osId: string) {
       CausaIntervencao: this.causaIntervencao,
       ColaboradorId: this.operadorMotorista,
       ManutentorResponsavelId: this.manutentor,
-      Status: (this.statusCodigo !== null && this.statusCodigo !== undefined) ? this.statusCodigo : 1,
+      //Status: (this.statusCodigo !== null && this.statusCodigo !== undefined) ? this.statusCodigo : 1,
+      Status: this.statusCodigo,
       DataAbertura: this.dataAbertura,
       DataFechamento: this.dataConclusao,
 
@@ -1663,7 +1731,7 @@ if (faltando.length > 0) {
   return;
 }
 
-
+console.log("STATUS ENVIADO PARA API:", params.Status);
    // Log detalhado dos parâmetros
 
     this.ordemService.gravarOrdem(params).subscribe({
@@ -1681,6 +1749,11 @@ if (faltando.length > 0) {
           } else {
           }
           this.osId = returnedId;
+
+ // 🔥 SEMPRE recarregar a OS após salvar
+//if (this.osId && this.osId.length === 36) {
+   //this.carregarOsCompleta(this.osId);
+//}
         } else {
           // LOG: backend não retornou OsId válido
         }
@@ -1717,15 +1790,19 @@ this.router.navigate(['/tabs/ordem-servico-pesquisa'], {//DEFINIR PARA QUAL TELA
     });
   }
     //ALTERAÇÃO
-  irParaNovaFoto() {
-  // Só bloqueia se realmente NÃO existir OsId válido
+irParaNovaFoto() {
+
   if (!this.osId || this.osId.length !== 36) {
     this.mostrarToastAviso('Salve a OS antes de anexar foto.');
     return;
   }
 
   this.router.navigate(['/tabs/ordem-servico-nova-foto'], {
-    queryParams: { osId: this.osId, osCod: this.numeroOS, os: this.osId },
+    queryParams: {
+      osId: this.osId,
+      osCod: this.numeroOS,
+      status: this.statusCodigo ?? 1   // 🔥 ENVIA STATUS ATUAL
+    }
   });
 }
   onMotoristaChange(event: any) {

@@ -18,6 +18,7 @@ export class OrdemServicoNovaFotoPage {
   private fotoDataUrlUpload: string | null = null;
   osId: string = '';
   osCod: string = '';
+  statusCodigo: number = 1;  // 🔥 NOVO
 
   private getFotoCacheKeyById(osId: string) {
     return `os:lastFotoDataUrl:id:${osId}`;
@@ -187,6 +188,9 @@ export class OrdemServicoNovaFotoPage {
   ionViewWillEnter() {
     // Recebe o OsId (GUID) vindo da tela de edição
     this.route.queryParams.subscribe((params) => {
+
+      this.statusCodigo = Number(params?.['status']) || 1; //  NOVO
+
       // Sempre inicia com o campo/preview vazio (a foto salva fica na tela de edição).
       this.fotoBase64 = null;
       this.foto = null;
@@ -528,50 +532,135 @@ export class OrdemServicoNovaFotoPage {
   }
 
   // confirmar inclusão da foto
-  confirmarFoto() {
-    const dataUrlUpload = this.fotoDataUrlUpload || this.fotoBase64 || this.foto;
-    const dataUrlCache = this.fotoBase64 || this.foto;
+ confirmarFoto() {
 
-    if (!this.osId || typeof this.osId !== 'string' || this.osId.length !== 36 || !/^[0-9a-fA-F-]{36}$/.test(this.osId)) {
-      this.toast('OS sem identificador (OsId). Salve a OS antes de anexar foto.', 'warning');
-      return;
-    }
-    if (!dataUrlUpload || !dataUrlCache) {
-      this.toast('Selecione uma foto antes de confirmar.', 'warning');
-      return;
-    }
+  const dataUrlUpload = this.fotoDataUrlUpload || this.fotoBase64 || this.foto;
+  const dataUrlCache = this.fotoBase64 || this.foto;
 
-    const base64 = this.getPureBase64(dataUrlUpload);
-    const osCodValue: string | number | undefined = this.osCod
-      ? (/^\d+$/.test(this.osCod) ? Number(this.osCod) : this.osCod)
-      : undefined;
+  if (!this.osId || this.osId.length !== 36) {
+    this.toast('OS sem identificador (OsId). Salve a OS antes de anexar foto.', 'warning');
+    return;
+  }
 
-    this.ordemService.gravarOrdemServicoFoto(this.osId, base64, undefined, osCodValue).subscribe({
-      next: (res) => {
-        // Guarda a foto no cache (lista) para aparecer na edição e manter histórico.
-        const returnedId = String(res ?? '').replace(/^"|"$/g, '').trim();
-        const fotoId = returnedId && returnedId.length === 36 ? returnedId : undefined;
-        // Guarda no cache com o preview menor (evita estourar localStorage)
-        this.appendFotoNoCache(dataUrlCache, fotoId);
-        this.persistirUltimaFotoAnexada(dataUrlCache, fotoId);
+  if (!dataUrlUpload || !dataUrlCache) {
+    this.toast('Selecione uma foto antes de confirmar.', 'warning');
+    return;
+  }
 
-        // Limpa o campo/preview para a próxima foto
-        this.fotoBase64 = null;
-        this.foto = null;
-        this.fotoFile = null;
-        this.fotoDataUrlUpload = null;
+  const base64 = this.getPureBase64(dataUrlUpload);
 
-        this.toast('Foto enviada com sucesso e salva na API.', 'success');
+  // 🔥 1️⃣ Salva foto
+ // 🔥 1️⃣ Salva foto
+this.ordemService.gravarOrdemServicoFoto(
+  this.osId,
+  base64,
+  undefined,
+  this.osCod
+).subscribe({
 
-        // Após anexar foto, volta para a lista de OS (pesquisa)
-        this.router.navigate(['/tabs/ordem-servico-pesquisa'], {
-          queryParams: { highlightOs: this.osCod },
-         replaceUrl: true
+  next: (res) => {
+
+    const returnedId = String(res ?? '')
+      .replace(/^"|"$/g, '')
+      .trim();
+
+    const fotoId =
+      returnedId && returnedId.length === 36
+        ? returnedId
+        : undefined;
+
+    this.appendFotoNoCache(dataUrlCache!, fotoId);
+    this.persistirUltimaFotoAnexada(dataUrlCache!, fotoId);
+
+    // 🔥 2️⃣ Busca OS atual COMPLETA
+    this.ordemService.buscarOSPorId(this.osId).subscribe({
+
+      next: (osArray: any) => {
+
+        const os = Array.isArray(osArray) ? osArray[0] : osArray;
+
+        if (!os) {
+          this.toast('Foto enviada, mas não foi possível atualizar o status.', 'warning');
+          return;
+        }
+
+        // 🔥 3️⃣ Monta payload COMPLETO preservando todos os campos
+// 🔥 3️⃣ Monta payload COMPLETO corretamente mapeado
+const payloadCompleto =
+  this.ordemService.montarPayloadOrdemServico({
+
+    OsId: this.osId,
+
+    Descricao: os.osDescricao ?? os.Descricao ?? '',
+    EquipamentoId: os.equipId ?? os.EquipamentoId ?? '',
+
+    EmpreendimentoId: os.emprdId ?? os.EmpreendimentoId ?? '',
+    EmpreendimentoIntervencao: os.emprdintervencaoId ?? '',
+
+    Classificacao: os.classifCod ?? os.ClassificacaoId ?? '',
+    TipoOs: os.tpServCod ?? os.TipoServicoId ?? '',
+    CausaIntervencao: os.causasId ?? os.CausasId ?? '',
+
+  ColaboradorId:
+  os.MotoristaOperadorId && os.MotoristaOperadorId.length === 36
+    ? os.MotoristaOperadorId
+    : os.ColaboradorId && os.ColaboradorId.length === 36
+      ? os.ColaboradorId
+      : '',
+    ManutentorResponsavelId: os.manutentorId ?? os.ManutentorResponsavelId ?? '',
+
+    DataAbertura: os.osDataAbertura ?? os.DataAbertura ?? null,
+    DataFechamento: os.osDataConclusao ?? os.DataFechamento ?? null,
+
+    Odometro: os.odometro ?? '',
+    Horimetro: os.horimetro ?? '',
+
+    DefeitosConstatados: os.obsDef ?? '',
+    CausasProvaveis: os.obsCausas ?? '',
+    Observacao: os.observacao ?? '',
+
+    Status: this.statusCodigo ?? 1
+
+  });
+
+this.ordemService.gravarOrdem(payloadCompleto).subscribe({
+
+          next: () => {
+
+            this.toast('Foto enviada e status preservado.', 'success');
+
+            this.router.navigate(
+              ['/tabs/ordem-servico-pesquisa'],
+              {
+                queryParams: { highlightOs: this.osCod },
+                replaceUrl: true
+              }
+            );
+
+          },
+
+          error: (err) => {
+            this.toast(this.getErrorMessage(err), 'danger');
+          }
+
         });
+
       },
+
       error: (err) => {
         this.toast(this.getErrorMessage(err), 'danger');
       }
+
     });
+
+  },
+
+  error: (err) => {
+    this.toast(this.getErrorMessage(err), 'danger');
   }
+
+});
+ }
 }
+
+

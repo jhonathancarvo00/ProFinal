@@ -166,7 +166,7 @@ export class OrdemServicoService {
       // contrato do Swagger
       ordemServicoId,
       fotoOrdemServicoBase64,
-      ...(fotoId ? { fotoId } : {}),
+    fotoId: fotoId ?? null,
 
       // aliases legados comuns
       OsId: ordemServicoId,
@@ -232,7 +232,9 @@ export class OrdemServicoService {
       OsId: asString(dados['OsId'] || dados['IdOs']),
       Descricao: asString(dados['Descricao']).toUpperCase(),
       EquipamentoId: asString(dados['EquipamentoId']),
-      Status: asString(dados['Status']),
+    Status: Number(dados['Status'] ?? 1),
+StatusId: Number(dados['Status'] ?? 1),
+statusCod: Number(dados['Status'] ?? 1),
       OsDataAbertura: asString(dados['OsDataAbertura'] || dados['DataAbertura']),
       OsDataConclusao: asString(dados['OsDataConclusao'] || dados['DataFechamento']),
       TipoServicoId: asString(dados['TipoServicoId'] || dados['TipoOs']),
