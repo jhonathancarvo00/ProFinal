@@ -94,29 +94,60 @@ onBombaChange(value: string | null) {
   this.insumoSelecionado = null;
   this.insumos = [];
 
+
+
+
   if (this.bombaSelecionada) {
-    this.carregarEmpreendimentoPorBomba(this.bombaSelecionada);
+this.abastecimentoService.listarBicos(this.bombaSelecionada).subscribe({
+  next: (bicos) => {
 
-    this.abastecimentoService.listarBicos(this.bombaSelecionada).subscribe({
-      next: (bicos) => {
-        this.bicos = bicos || [];
-      },
-      error: () => {},
-    });
+    console.log('BICOS RETORNADOS DA API:', bicos);
 
-    this.abastecimentoService.listarDestinos(this.bombaSelecionada).subscribe({
-      next: (destinos) => {
-        this.destinos = destinos || [];
-      },
-      error: () => {},
-    });
+    this.bicos = (bicos || []).map((b: any) => ({
+      id: b.bicoId,
+      descricao: b.bicoDescricao
+    }));
+
+  },
+  error: () => {
+    this.bicos = [];
+  },
+});
+
+ this.abastecimentoService.listarDestinos(this.bombaSelecionada).subscribe({
+  next: (destinosApi) => {
+
+    this.destinos = (destinosApi || []).map((d: any) => ({
+      id: d.destino,
+      descricao: d.destinoDesc || d.destino,
+      destinoTipo: d.destinoTipo,
+      destinoid: d.destinoid
+    }));
+
+     // 🔥 AQUI É O SEGREDO
+    if (this.equipamentoSelecionado) {
+      this.definirDestinoComoEquipamento();
+    }
+
+  },
+  error: () => {
+    this.destinos = [];
+  },
+});
 
     this.abastecimentoService.listarInsumosComboio(this.bombaSelecionada).subscribe({
-      next: (insumos) => {
-        this.insumos = insumos || [];
-      },
-      error: () => {},
-    });
+ next: (insumosApi) => {
+
+    this.insumos = (insumosApi || []).map((i: any) => ({
+      id: i.insumoId,
+      descricao: i.insumoDescr
+    }));
+
+  },
+  error: () => {
+    this.insumos = [];
+  },
+});
 
   } else {
     this.empreendimentos = [];
@@ -125,7 +156,7 @@ onBombaChange(value: string | null) {
 
 /* 🔥 ADAPTADOR AUTOCOMPLETE BOMBA */
 selecionarBomba(item: any) {
-  const bombaId = item?.bombaId ?? null;
+  const bombaId = item?.id ?? null;
   this.onBombaChange(bombaId);
 }
 
@@ -139,22 +170,26 @@ onBicoChange(value: string | null) {
 
 /* 🔥 ADAPTADOR AUTOCOMPLETE BICO */
 selecionarBico(item: any) {
-  this.onBicoChange(item?.bicoId ?? null);
+  this.onBicoChange(item?.id ?? null);
 }
-
 // =======================
 // DESTINO
 // =======================
 onDestinoChange(value: string | null) {
 
+  if (this.destinoTravado) {
+    return; // 🔥 Se estiver travado, ignora alteração manual
+  }
+
   this.destinoSelecionado = value ? String(value) : null;
 
   const destinoObj = this.destinos.find(d => d.destino === this.destinoSelecionado);
 
-  // 🔥 Se não for destino tipo Equipamento, limpar equipamento
+  // 🔥 Se NÃO for Equipamento → limpa equipamento
   if (destinoObj && destinoObj.destinoTipo !== 'M') {
     this.equipamentoSelecionado = null;
   }
+
 }
 
 /* 🔥 ADAPTADOR AUTOCOMPLETE DESTINO */
@@ -195,7 +230,10 @@ onInsumoChange(value: string | null) {
 
 /* 🔥 ADAPTADOR AUTOCOMPLETE INSUMO */
 selecionarInsumo(item: any) {
-  this.onInsumoChange(item?.insumoId ?? null);
+  this.onInsumoChange(item?.id ?? null);
+
+this.tentarCarregarBlocos();
+
 }
 /* 🔥 ADAPTADOR AUTOCOMPLETE TROCA/REPOSIÇÃO */
 selecionarTipoPrevAbast(item: any) {
@@ -203,7 +241,9 @@ selecionarTipoPrevAbast(item: any) {
 }
 /* 🔥 ADAPTADOR AUTOCOMPLETE APLICAÇÃO */
 selecionarAplicacao(item: any) {
-  this.aplicacaoSelecionada = item?.id ?? null;
+  this.aplicacaoSelecionada = item?.aplicacaoId ?? null;
+
+   this.tentarCarregarBlocos(); 
 }
 /* 🔥 ADAPTADOR AUTOCOMPLETE MOTORISTA */
 selecionarMotoristaOperador(item: any) {
@@ -256,21 +296,21 @@ selecionarBloco(item: any) {
   aplicacaoSelecionada: string | null = null;
   aplicacoes: AplicacaoDto[] = [];
   aplicacaoHabilitada = false;
-  insumos: InsumoDto[] = [];
+insumos: any[] = [];
   insumoSelecionado: string | null = null;
-  etapas: EtapaDto[] = [];
+  etapas: { id: string; descricao: string }[] = [];
   etapaSelecionada: string | null = null;
   empreendimentos: EmpreendimentoDto[] = [];
   empreendimentoSelecionado: string | null = null;
   data: string | null = null;
-  bombas: BombaDto[] = [];
+ bombas: { id: string; descricao: string }[] = [];
   equipamentos: EquipamentoDto[] = [];
   bombaSelecionada: string | null = null;
   equipamentoSelecionado: string | null = null;
   destinoSelecionado: string | null = null;
   bicoSelecionado: string | null = null;
-  bicos: BicoDto[] = [];
-  destinos: DestinoDto[] = [];
+  bicos: any[] = [];
+destinos: any[] = [];
   quantidade: number | null = null;
   numBombaInicial: number | null = null;
   numBombaFinal: number | null = null;
@@ -287,12 +327,14 @@ selecionarBloco(item: any) {
   // Dados do abastecimento para edição
   dadosAbastecimento: any = null;
 
+  destinoTravado = false;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private popoverCtrl: PopoverController,
     private abastecimentoService: AbastecimentoService,
-    private etapaService: EtapaService,
+    //private etapaService: EtapaService,
     private insumoService: InsumoService,
     private toastCtrl: ToastController
   ) {
@@ -412,7 +454,12 @@ selecionarBloco(item: any) {
                     promises.push(
                       this.abastecimentoService.listarBicos(bombaId)
                         .toPromise()
-                        .then(bicos => this.bicos = bicos || [])
+                        .then(bicos => {
+  this.bicos = (bicos || []).map(b => ({
+    id: b.bicoId,
+    descricao: b.bicoDescricao
+  }));
+})
                     );
 
                     promises.push(
@@ -429,30 +476,33 @@ selecionarBloco(item: any) {
                   }
 
                   if (empreendimentoId && insumoId) {
-                    promises.push(
-                      this.etapaService.listarEtapas(empreendimentoId, insumoId)
-                        .toPromise()
-                        .then(etapas => this.etapas = etapas || [])
-                    );
+                   promises.push(
+  this.abastecimentoService.listarEtapas({
+    empreendimentoId,
+    insumoId,
+    mostrarDI: true
+  })
+  .toPromise()
+  .then((etapas: any[]) => {
+    this.etapas = (etapas || []).map(e => ({
+      id: String(e.id),
+      descricao: e.descricao || e.nome
+    }));
+  })
+);
 
-                    promises.push(
-                      this.abastecimentoService
-                        .listarBlocosPorEmpreendimento(empreendimentoId, insumoId)
-                        .toPromise()
-                        .then(blocos => this.blocos = blocos || [])
-                    );
+                   
                   }
 
-                  Promise.all(promises).then(() => {
-                    this.preencherFormularioComDados(dados);
+                Promise.all(promises).then(() => {
+                  this.preencherFormularioComDados(dados);
 
-                    if (this.empreendimentoSelecionado && this.insumoSelecionado) {
-                      this.carregarBlocosPorEmpreendimento(this.empreendimentoSelecionado);
-                    }
-                    if (this.equipamentoSelecionado && this.insumoSelecionado) {
-    this.carregarAplicacoes()
-                    }
-                  });
+                  this.tentarCarregarBlocos(); //carregar blocos no momento certo
+
+                  if (this.equipamentoSelecionado && this.insumoSelecionado) {
+                    this.carregarAplicacoes();
+                  }
+                });
                 }
               },
               error: () => {
@@ -553,14 +603,24 @@ if (this.bombaSelecionada) {
   });
 
   // Carregar DESTINOS
-  this.abastecimentoService.listarDestinos(this.bombaSelecionada).subscribe({
-    next: (destinos) => {
-      this.destinos = destinos || [];
-    },
-    error: () => {
-      this.destinos = [];
-    }
-  });
+this.abastecimentoService.listarDestinos(this.bombaSelecionada).subscribe({
+  next: (destinosApi) => {
+
+    this.destinos = (destinosApi || []).map((d: any) => ({
+      id: d.destino,
+      destino: d.destino,
+      descricao: d.destinoDesc || d.destino,
+      destinoTipo: d.destinoTipo,
+      destinoid: d.destinoid
+    }));
+
+    // 🔥 AQUI É O SEGREDO
+    this.aplicarRegraEquipamentoDestino();
+  },
+  error: () => {
+    this.destinos = [];
+  },
+});
 
   // 🔥 CARREGAR INSUMOS (o que estava faltando)
   this.abastecimentoService.listarInsumosComboio(this.bombaSelecionada).subscribe({
@@ -684,22 +744,45 @@ if (this.bombaSelecionada) {
     //
   }
 
-  private carregarBlocosPorEmpreendimento(empreendimentoId: string) {
-    // Só carrega blocos se empreendimento e insumo estiverem preenchidos
-    if (!empreendimentoId || !this.insumoSelecionado) {
-      this.blocos = [];
-      return;
-    }
-    this.abastecimentoService.listarBlocosPorEmpreendimento(empreendimentoId, this.insumoSelecionado).subscribe({
+private carregarBlocosPorEmpreendimento(empreendimentoId: string) {
+
+  if (!empreendimentoId || !this.insumoSelecionado) {
+    this.blocos = [];
+    return;
+  }
+
+  this.abastecimentoService
+
+    .listarBlocosPorEmpreendimento(
+      empreendimentoId,
+      this.insumoSelecionado,
+      this.aplicacaoSelecionada ?? undefined
+    )
+    .subscribe({
       next: (blocos) => {
         this.blocos = blocos || [];
       },
       error: () => {
         this.blocos = [];
-      },
+      }
     });
-  }
+}
 
+/*
+private tentarCarregarBlocos() {
+
+  if (
+    this.empreendimentoSelecionado &&
+    this.insumoSelecionado &&
+    this.aplicacaoSelecionada
+  ) {
+    console.log(" Chamando blocos...");
+    this.carregarBlocosPorEmpreendimento(this.empreendimentoSelecionado);
+  } else {
+    this.blocos = [];
+  }
+}
+*/
 
   private carregarColaboradoresFrentista() {
     this.abastecimentoService.listarColaboradoresFrentista().subscribe({
@@ -719,43 +802,107 @@ if (this.bombaSelecionada) {
     });
   }
 
+private tentarCarregarBlocos() {
 
+  if (
+    this.empreendimentoSelecionado &&
+    this.insumoSelecionado &&
+    this.aplicacaoSelecionada
+  ) {
 
-  private carregarEmpreendimentoPorBomba(bombaId: string) {
-    const bomba = this.bombas.find(b => b.bombaId === bombaId);
-    if (bomba && bomba.empreendimentoId) {
-      this.abastecimentoService.listarEmpreendimentos().subscribe({
-        next: (emps) => {
-          this.empreendimentos = (emps || []).filter(e => e.id === bomba.empreendimentoId);
+    console.log("🧪 TESTE: empreendimento + insumo + aplicação");
+
+    this.abastecimentoService
+      .listarBlocosPorEmpreendimento(
+        this.empreendimentoSelecionado,
+        this.insumoSelecionado,
+        this.aplicacaoSelecionada
+      )
+      .subscribe({
+        next: (blocos) => {
+          console.log("📦 Resultado:", blocos);
+          this.blocos = blocos || [];
         },
-        error: () => {},
+        error: () => {
+          this.blocos = [];
+        }
       });
-    } else {
-      this.empreendimentos = [];
-    }
+
+  } else {
+    this.blocos = [];
+  }
+}
+
+private aplicarRegraEquipamentoDestino() {
+
+  if (!this.equipamentoSelecionado) {
+    return;
   }
 
+  const destinoEquip = this.destinos.find(d => d.destinoTipo === 'M');
+
+  if (destinoEquip) {
+    this.destinoSelecionado = destinoEquip.destino;
+    this.destinoTravado = true;
+  }
+}
+private definirDestinoComoEquipamento() {
+
+  if (!this.destinos || this.destinos.length === 0) {
+    return; // ainda não carregou
+  }
+
+  const destinoEquip = this.destinos.find(d => d.destinoTipo === 'M');
+
+  if (destinoEquip) {
+    this.destinoSelecionado = destinoEquip.destino;
+    this.destinoTravado = true;
+  }
+}
+
+private carregarEmpreendimentoPorBomba(bombaId: string) {
+
+  if (!bombaId) {
+    this.empreendimentos = [];
+    return;
+  }
+
+  this.abastecimentoService.listarEmpresas().subscribe({
+    next: (emps) => {
+      this.empreendimentos = emps || [];
+    },
+    error: () => {
+      this.empreendimentos = [];
+    },
+  });
+
+}
+
 onEmpreendimentoChange(value: string | null) {
+  
 
   this.empreendimentoSelecionado = value ? String(value) : null;
 
-  // Limpar seleções dependentes
+  this.tentarCarregarBlocos();
+
+  // limpar dependentes
   this.etapaSelecionada = null;
   this.etapas = [];
   this.blocos = [];
   this.blocoSelecionado = null;
 
-  // Carregar blocos
-  if (this.empreendimentoSelecionado) {
-    this.carregarBlocosPorEmpreendimento(this.empreendimentoSelecionado);
+  if (!this.empreendimentoSelecionado) {
+    return;
   }
 
-  // Se já tiver insumo, carregar etapas
-  if (this.insumoSelecionado && this.empreendimentoSelecionado) {
-    this.carregarEtapas();
-  }
+  if (this.insumoSelecionado) {
+  this.carregarEtapas();
 }
 
+
+  // 🔥 carregar etapas (agora corretamente)
+  this.carregarEtapas();
+}
 /* 🔥 ADAPTADOR AUTOCOMPLETE EMPREENDIMENTO */
 selecionarEmpreendimento(item: any) {
   const empreendimentoId = item?.id ?? null;
@@ -763,66 +910,52 @@ selecionarEmpreendimento(item: any) {
 }
 
 
-
-
-
-
-
-
-
-
-
 onEquipamentoChange(value: string | null) {
 
   this.equipamentoSelecionado = value ? String(value) : null;
 
   if (this.equipamentoSelecionado) {
+    this.definirDestinoComoEquipamento();
+  } else {
+    this.destinoTravado = false;
 
-    // 🔥 Setar destino automaticamente para "Equipamento"
-    const destinoEquip = this.destinos.find(d => d.destinoTipo === 'M');
+    const destinoAtual = this.destinos.find(d => d.destino === this.destinoSelecionado);
 
-    if (destinoEquip) {
-      this.destinoSelecionado = destinoEquip.destino;
+    if (destinoAtual && destinoAtual.destinoTipo === 'M') {
+      this.destinoSelecionado = null;
     }
-
   }
 
-  // Se tiver insumo, continua carregando aplicação
   if (this.insumoSelecionado) {
     this.carregarAplicacoes();
   }
 }
 
 
-
   // ✨ Método auxiliar para carregar etapas
-  private carregarEtapas() {
-    // ⚠️ IMPORTANTE: Etapas só carregam se EMPREENDIMENTO estiver selecionado
-    if (!this.empreendimentoSelecionado) {
-      //
-      return;
-    }
+private carregarEtapas() {
 
-    if (!this.insumoSelecionado) {
-      //
-      return;
-    }
-
-    //
-
-    this.etapaService.listarEtapas(this.empreendimentoSelecionado, this.insumoSelecionado).subscribe({
-      next: (etapas) => {
-        this.etapas = etapas || [];
-        //
-        if (this.etapas.length === 0) {
-          //
-        } else {
-          //
-        }
-      },
-      error: () => {},
-    });
+  if (!this.empreendimentoSelecionado || !this.insumoSelecionado) {
+    this.etapas = [];
+    return;
   }
+
+  this.abastecimentoService.listarEtapas({
+    empreendimentoId: this.empreendimentoSelecionado,
+    insumoId: this.insumoSelecionado,
+    mostrarDI: true
+  }).subscribe({
+    next: (etapas: any[]) => {
+      this.etapas = (etapas || []).map(e => ({
+        id: String(e.id),
+        descricao: e.descricao || e.nome
+      }));
+    },
+    error: () => {
+      this.etapas = [];
+    }
+  });
+}
 
 private carregarAplicacoes() {
 
@@ -913,19 +1046,33 @@ private carregarAplicacoes() {
     }
   }
 
+// 🔥 PADRONIZA LISTAS PARA O AUTOCOMPLETE
+private padronizarLista(lista: any[], idField: string, descField: string) {
+  return (lista || []).map(item => ({
+    id: item?.[idField],
+    descricao: item?.[descField]
+  }));
+}
+
+
+
+
   private carregarBombas() {
     this.abastecimentoService.listarBombas().subscribe({
       next: (bombas) => {
-        this.bombas = bombas || [];
+        this.bombas = this.padronizarLista(
+  bombas,
+  'bombaId',
+  'bombaDescricao'
+);
+
+  console.log("BOMBAS RETORNADAS DA API:", bombas);
+      console.log("BOMBAS NA TELA:", this.bombas);
+
       },
       error: () => {},
     });
   }
-
-
-
-
-
 
 
   private carregarEquipamentos() {
@@ -1149,4 +1296,7 @@ onObservacaoChange(event: Event) {
     });
   }
 }
+
+
+
 

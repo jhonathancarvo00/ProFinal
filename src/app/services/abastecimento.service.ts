@@ -221,36 +221,57 @@ export class AbastecimentoService {
     // Normalização pode ser feita no componente que consome, se necessário
   }
 
-  listarBlocosPorEmpreendimento(empreendimentoId: string, requisito?: string) {
-    // Só envia se empreendimentoId for válido (não null, não vazio, não GUID zerado)
-    const guidZerado = '00000000-0000-0000-0000-000000000000';
-    if (!empreendimentoId || empreendimentoId === guidZerado) {
-      // Retorna Observable de array vazio
-      return this.api.of([]);
-    }
-    const body: Record<string, unknown> = { empreendimentoId, requisito: requisito ?? '' };
-    return this.api.post<LookupItem[]>('/api/cadastros/Lookups/Blocos', body);
+  /*
+listarBlocosPorEmpreendimento(
+  empreendimentoId: string,
+  requisito?: string,
+  aplicacaoId?: string
+) {
+  const guidZerado = '00000000-0000-0000-0000-000000000000';
+
+  if (!empreendimentoId || empreendimentoId === guidZerado) {
+    return this.api.of([]);
   }
 
-  listarUnidadesPorBloco(blocoId: string) {
-    return this.api.post<LookupItem[]>('/api/cadastros/Lookups/Unidades', { blocoId });
+  const body: Record<string, unknown> = {
+    empreendimentoId,
+    requisito: requisito ?? '',
+    aplicacaoId: aplicacaoId ?? '' // 🔥 NOVO
+  };
+
+  return this.api.post<LookupItem[]>('/api/cadastros/Lookups/Blocos', body);
+}
+*/
+listarBlocosPorEmpreendimento(
+  empreendimentoId: string,
+  requisito?: string,
+  aplicacaoId?: string
+) {
+  const guidZerado = '00000000-0000-0000-0000-000000000000';
+
+  if (!empreendimentoId || empreendimentoId === guidZerado) {
+    return this.api.of([]);
   }
 
-  listarColaboradoresFrentista() {
-    return this.api.post<ColaboradorFrentistaDto[]>('/api/cadastros/Lookups/Pessoas', { tipoPessoa: 'Funcionário' });
+  const body: Record<string, unknown> = {
+    empreendimentoId
+  };
+
+  if (requisito) {
+    body['requisito'] = requisito;
   }
 
-  // Fornecedores (Lookup correto)
-  listarFornecedores(pesquisa: string = '', valorSelecionado: string = '') {
-    return this.api.post<LookupItem[]>(
-      '/api/cadastros/Lookups/Pessoas',
-      {
-        pesquisa,
-        valorSelecionado,
-        tipoPessoa: 'Fornecedor'
-      }
-    );
+  if (aplicacaoId) {
+    body['aplicacaoId'] = aplicacaoId;
   }
+
+  return this.api.post<LookupItem[]>(
+    '/api/cadastros/Lookups/Blocos',
+    body
+  );
+}
+
+
 
   listarColaboradoresMotoristaOperador() {
     return this.api.get<MotoristaOperadorDto[]>('/api/frotas/OrdensServico/ConsultaColaborador', { Classificacao: 1 });
@@ -286,7 +307,14 @@ export class AbastecimentoService {
   listarEquipamentos() {
     return this.api.post<EquipamentoDto[]>('/api/frotas/Lookups/Equipamentos', {});
   }
-
+listarColaboradoresFrentista() {
+  return this.api.post<any[]>(
+    '/api/cadastros/Lookups/Pessoas',
+    {
+      tipoPessoa: 'Funcionário'
+    }
+  );
+}
   // Consulta de abastecimento próprio (tela de pesquisa)
   consultarAbastecimentoProprio(filtros: {
     origemTanque?: string;
@@ -513,7 +541,16 @@ export class AbastecimentoService {
       body
     );
   }
-
+listarFornecedores(pesquisa: string = '', valorSelecionado: string = '') {
+  return this.api.post<any[]>(
+    '/api/cadastros/Lookups/Pessoas',
+    {
+      pesquisa,
+      valorSelecionado,
+      tipoPessoa: 'Fornecedor'
+    }
+  );
+}
   // Blocos (por empreendimento)
   listarBlocos(empreendimentoId: string, pesquisa: string = '', valorSelecionado: string = '') {
     const body: Record<string, unknown> = {

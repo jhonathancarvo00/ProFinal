@@ -21,15 +21,13 @@
 <div class="abp-field">
   <label class="abp-label">Origem / Tanque</label>
 
-  <app-autocomplete
+<app-autocomplete
   [lista]="bombas"
   campoDescricao="bombaDescricao"
   [valorSelecionado]="bombaSelecionada"
-  (selecionado)="bombaSelecionada = $event?.bombaId; onBombaChange($event)"
->
+  (selecionado)="selecionarBomba($event)">
 </app-autocomplete>
 </div>
-
 
 
 
@@ -82,21 +80,22 @@ campoDescricao="descricao"
       <!-- Bomba / Bico e Destino (ainda sem API, por enquanto só layout) -->
       <div class="abp-group-row">
         <div class="abp-field abp-half">
-          <label class="abp-label">Bomba / Bico</label>
-  <app-autocomplete
-  [lista]="bombas"
-  campoDescricao="bombaDescricao"
-  [valorSelecionado]="bombaSelecionada"
-  (selecionado)="selecionarBomba($event)">
+<label>Bomba / Bico</label>
+<app-autocomplete
+  [lista]="bicos"
+  campoDescricao="descricao"
+  [valorSelecionado]="bicoSelecionado"
+  (selecionado)="bicoSelecionado = $event?.id">
 </app-autocomplete>
         </div>
 
         <div class="abp-field abp-half">
           <label class="abp-label">Destino</label>
- <app-autocomplete
+<app-autocomplete
   [lista]="destinos"
   campoDescricao="destinoDesc"
   [valorSelecionado]="destinoSelecionado"
+  [disabled]="destinoTravado"
   (selecionado)="selecionarDestino($event)">
 </app-autocomplete>
         </div>
@@ -108,12 +107,13 @@ campoDescricao="descricao"
 <div class="abp-field abp-half">
   <label class="abp-label">Empreendimento</label>
 
+<!-- Empreendimento -->
 <app-autocomplete
-  [lista]="destinos"
-  campoDescricao="destinoDesc"
-  [valorSelecionado]="destinoSelecionado"
+  [lista]="empreendimentos"
+  campoDescricao="descricao"
+  [valorSelecionado]="empreendimentoSelecionado"
   [disabled]="!!equipamentoSelecionado"
-  (selecionado)="selecionarDestino($event)">
+  (selecionado)="selecionarEmpreendimento($event)">
 </app-autocomplete>
 </div>
 
@@ -206,7 +206,7 @@ campoDescricao="descricao"
 
     <app-autocomplete
       [lista]="aplicacoes"
-      campoDescricao="descricao"
+      campoDescricao="aplicacaoDescr"
       [valorSelecionado]="aplicacaoSelecionada"
       (selecionado)="selecionarAplicacao($event)">
     </app-autocomplete>
