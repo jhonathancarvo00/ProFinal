@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { OrdemServicoService } from '../../services/ordem-servico.service';
 
 export interface OrdemServicoListaItem {
+  osId?: string; 
   osCod: string;
   osDescricao: string;
   equipCod: string;
@@ -188,6 +189,7 @@ if (empreendimentoValor) {
       const statusCod = Number(item?.statusCod ?? item?.Status ?? 0);
 
       return {
+        osId: item?.OsId ?? item?.IdOs ?? item?.id ?? item?.osId ?? null,
         osCod: String(item?.osCod ?? item?.NumeroOs ?? item?.IdOs ?? ''),
         osDescricao: item?.osDescricao ?? item?.Descricao ?? '',
         equipCod: item?.equipCod ?? item?.EquipamentoId ?? '',
@@ -272,64 +274,17 @@ const filtrosApi = {
     this.router.navigate(['/tabs/ordem-servico']);
   }
 
-  verDetalhes(os: OrdemServicoListaItem) {
-    // Busca sempre pelo GUID. Se não houver, busca pelo número e depois pelo GUID.
-    const guid = os['OsId'] || os['IdOs'] || os['id'] || os['osId'] || os['Id'] || os['guid'];
-    if (guid && String(guid).length === 36) {
-      // GUID válido, busca detalhes completos
-      this.buscarDetalhesPorGuid(guid);
-    } else if (os.osCod) {
-      // Não tem GUID, busca pelo número para obter o GUID
-      this.ordemService.buscarOSPorNumero(os.osCod).subscribe({
-        next: (res) => {
-          let osItem = null;
-          if (Array.isArray(res)) {
-            osItem = res.find(item => String(item.osCod) === String(os.osCod));
-          } else {
-            osItem = res;
-          }
-          if (osItem) {
-            const guidNovo = osItem['OsId'] || osItem['IdOs'] || osItem['id'] || osItem['osId'] || osItem['Id'] || osItem['guid'];
-            if (guidNovo && String(guidNovo).length === 36) {
-              this.buscarDetalhesPorGuid(guidNovo);
-            } else {
-              alert('Não foi possível localizar o GUID da OS.');
-            }
-          } else {
-            alert('OS não encontrada na resposta da API.');
-          }
-        },
-        error: () => {
-          alert('Erro ao buscar detalhes da OS. Tente novamente.');
-        }
-      });
-    } else {
-      alert('Não foi possível identificar a OS para detalhamento.');
-    }
+verDetalhes(os: OrdemServicoListaItem) {
+
+  const guid = os['osId'] || os['OsId'] || os['IdOs'] || os['id'];
+
+  if (!guid || String(guid).length !== 36) {
+    alert('GUID da OS não encontrado.');
+    return;
   }
 
-  private buscarDetalhesPorGuid(guid: string) {
-    this.ordemService.buscarOSPorId(guid).subscribe({
-      next: (res) => {
-        let osCompleta = null;
-        if (Array.isArray(res)) {
-          osCompleta = res.find(item => String(item.OsId || item.IdOs || item.id || item.osId) === String(guid));
-        } else {
-          osCompleta = res;
-        }
-        if (!osCompleta) {
-          alert('OS não encontrada na resposta da API.');
-          return;
-        }
-        this.router.navigate(['/tabs/ordem-servico-edicao'], {
-          queryParams: {
-            os: JSON.stringify(osCompleta),
-          },
-        });
-      },
-      error: () => {
-        alert('Erro ao buscar detalhes da OS. Tente novamente.');
-      }
-    });
-  }
+  this.router.navigate(['/tabs/ordem-servico-edicao'], {
+    queryParams: { os: guid }
+  });
+}
 }

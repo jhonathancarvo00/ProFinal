@@ -36,6 +36,8 @@ export type EquipamentoLookup = LookupItem & {
   modelo?: string;
 };
 
+
+
 export type EmpresaLookup = LookupItem & {
   descricao?: string;
 };
@@ -221,37 +223,11 @@ export class AbastecimentoService {
     // Normalização pode ser feita no componente que consome, se necessário
   }
 
-  /*
-listarBlocosPorEmpreendimento(
+listarBlocosPosto(
   empreendimentoId: string,
   requisito?: string,
   aplicacaoId?: string
 ) {
-  const guidZerado = '00000000-0000-0000-0000-000000000000';
-
-  if (!empreendimentoId || empreendimentoId === guidZerado) {
-    return this.api.of([]);
-  }
-
-  const body: Record<string, unknown> = {
-    empreendimentoId,
-    requisito: requisito ?? '',
-    aplicacaoId: aplicacaoId ?? '' // 🔥 NOVO
-  };
-
-  return this.api.post<LookupItem[]>('/api/cadastros/Lookups/Blocos', body);
-}
-*/
-listarBlocosPorEmpreendimento(
-  empreendimentoId: string,
-  requisito?: string,
-  aplicacaoId?: string
-) {
-  const guidZerado = '00000000-0000-0000-0000-000000000000';
-
-  if (!empreendimentoId || empreendimentoId === guidZerado) {
-    return this.api.of([]);
-  }
 
   const body: Record<string, unknown> = {
     empreendimentoId
@@ -272,17 +248,20 @@ listarBlocosPorEmpreendimento(
 }
 
 
-
   listarColaboradoresMotoristaOperador() {
-    return this.api.get<MotoristaOperadorDto[]>('/api/frotas/OrdensServico/ConsultaColaborador', { Classificacao: 1 });
+    return this.api.get<MotoristaOperadorDto[]>
+    ('/api/frotas/OrdensServico/ConsultaColaborador', { Classificacao: 1 });
   }
 
-  consultarAplicacaoPrevEquipInsumo(equipamentoId: string, insumoId: string) {
-    return this.api.get<AplicacaoDto[]>(
-      '/api/frotas/Abastecimentos/ConsultaAplicacaoPrevEquipInsumo',
-      { equipamentoId, insumoId }
-    );
-  }
+consultarAplicacaoPrev(equipamentoId: string, insumoId: string) {
+  return this.api.get<any[]>(
+    '/api/frotas/Abastecimentos/ConsultaAplicacaoPrevEquipInsumo',
+    {
+      EquipamentoId: equipamentoId,
+      InsumoId: insumoId
+    }
+  );
+}
 
   listarInsumosComboio(bombaId: string) {
     return this.api.get<InsumoDto[]>(
@@ -291,9 +270,20 @@ listarBlocosPorEmpreendimento(
     );
   }
 
-  listarEmpreendimentos() {
-    return this.api.post<LookupItem[]>('/api/cadastros/Lookups/Empreendimentos', {});
+
+listarEmpreendimentos(emprdId?: string) {
+
+  const body: any = {};
+
+  if (emprdId) {
+    body.emprdId = emprdId;
   }
+
+  return this.api.post<LookupItem[]>(
+    '/api/cadastros/Lookups/Empreendimentos',
+    body
+  );
+}
 
   // Equipamentos (Mobile) - conforme documentação do Abastecimento Posto
   listarEquipamentosMobile() {
@@ -303,6 +293,12 @@ listarBlocosPorEmpreendimento(
   listarBombas() {
     return this.api.get<BombaDto[]>('/api/frotas/Abastecimentos/ConsultaBomba');
   }
+
+consultarBomba(bombaId: string) {
+  return this.api.get<BombaDto[]>(
+    `/api/frotas/Abastecimentos/ConsultaBomba?Id=${bombaId}`
+  );
+}
 
   listarEquipamentos() {
     return this.api.post<EquipamentoDto[]>('/api/frotas/Lookups/Equipamentos', {});
@@ -406,7 +402,7 @@ listarColaboradoresFrentista() {
       // Se ambos existem, prioriza AbastecimentoId (padrão backend)
       delete payload['abastecimentoId'];
     }
-
+/*
     // Garante que só um dos campos será enviado nos params
     const params: Record<string, unknown> = {};
     const keys = [
@@ -454,29 +450,26 @@ listarColaboradoresFrentista() {
       if (v !== null && typeof v !== 'undefined') {
         params[k] = v;
       }
-    }
-
-    return this.api.post('/api/frotas/Abastecimentos/GravaAbastecimento', payload, params);
+    }*/
+return this.api.post(
+  '/api/frotas/Abastecimentos/GravaAbastecimento',
+  payload
+);
   }
 
   // Bicos (referente à bomba)
-  listarBicos(bombaId: string) {
-    // ConsultaBico espera o parâmetro Id (bombaId)
-    return this.api.get<BicoDto[]>(
-      '/api/frotas/Abastecimentos/ConsultaBico',
-      { Id: bombaId }
-    );
-  }
-
+listarBicos(bombaId: string) {
+  return this.api.get<BicoDto[]>(
+    `/api/frotas/Abastecimentos/ConsultaBico?Id=${bombaId}`
+  );
+}
   // Destinos (referente à bomba)
-  listarDestinos(bombaId: string) {
-    // ConsultaDestinoAbastecimentos espera o parâmetro bombaId
-    return this.api.get<DestinoDto[]>(
-      '/api/frotas/Abastecimentos/ConsultaDestinoAbastecimentos',
-      { bombaId }
-    );
-  }
-
+listarDestinos(bombaId: string) {
+  // ConsultaDestinoAbastecimentos espera o parâmetro bombaId
+  return this.api.get<any[]>(
+    `/api/frotas/Abastecimentos/ConsultaDestinoAbastecimentos?bombaId=${bombaId}`
+  );
+}
   // Centro de Despesas (Plano de Contas)
   listarCentrosDespesas(
     pesquisa: string = '',
@@ -508,25 +501,18 @@ listarColaboradoresFrentista() {
   }
 
   // Etapas (por empreendimento)
-  listarEtapas(params: {
-    empreendimentoId: string;
-    pesquisa?: string;
-    valorSelecionado?: string;
-    mostrarDI?: boolean;
-    insumoId?: string;
-  }) {
-    const body: Record<string, unknown> = {
-      pesquisa: params.pesquisa || '',
-      valorSelecionado: params.valorSelecionado || '',
-      empreendimentoId: params.empreendimentoId,
-      mostrarDI: params.mostrarDI || false
-    };
-    if (params.insumoId) body['insumoId'] = params.insumoId;
-    return this.api.post<LookupItem[]>(
-      '/api/orcamentos/Lookups/Etapas',
-      body
-    );
-  }
+listarEtapas(empreendimentoId: string) {
+
+  const body = {
+    pesquisa: empreendimentoId,  // STRING
+    mostrarDI: false
+  };
+
+  return this.api.post<any[]>(
+    '/api/orcamentos/Lookups/Etapas',
+    body
+  );
+}
 
   // Insumos (por empreendimento, apenas de abastecimento)
   listarInsumos(empreendimentoId: string, pesquisa: string = '', valorSelecionado: string = '') {
@@ -541,6 +527,12 @@ listarColaboradoresFrentista() {
       body
     );
   }
+consultarUltimoNumeroBico(bombaId: string, bicoId: string) {
+  return this.api.get<number>(
+    `/api/frotas/Abastecimentos/ConsultaUltimoNumeroBico?bombaId=${bombaId}&bicoId=${bicoId}`
+  );
+}
+
 listarFornecedores(pesquisa: string = '', valorSelecionado: string = '') {
   return this.api.post<any[]>(
     '/api/cadastros/Lookups/Pessoas',
@@ -552,15 +544,16 @@ listarFornecedores(pesquisa: string = '', valorSelecionado: string = '') {
   );
 }
   // Blocos (por empreendimento)
-  listarBlocos(empreendimentoId: string, pesquisa: string = '', valorSelecionado: string = '') {
-    const body: Record<string, unknown> = {
-      pesquisa,
-      valorSelecionado,
-      empreendimentoId
-    };
-    return this.api.post<LookupItem[]>(
-      '/api/cadastros/Lookups/Blocos',
-      body
-    );
-  }
+listarBlocosProprio(empreendimentoId: string) {
+  return this.api.post(
+    '/api/cadastros/Lookups/Unidades',
+    {
+
+   empreendimentoId: empreendimentoId,
+   pesquisa: "",
+   valorSelecionado: ""
+
+    }
+  );
+}
 }

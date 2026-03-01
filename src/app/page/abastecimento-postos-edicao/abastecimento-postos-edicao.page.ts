@@ -657,25 +657,20 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
       return;
     }
 
-    const serviceParams: { empreendimentoId: string; mostrarDI?: boolean; insumoId?: string; valorSelecionado?: string } = {
-      empreendimentoId: String(params.empreendimentoId),
-      mostrarDI: params.mostrarDI,
-      insumoId: typeof params.insumoId !== 'undefined' ? String(params.insumoId) : undefined,
-      valorSelecionado: typeof params.valorSelecionado !== 'undefined' && params.valorSelecionado !== null
-        ? String(params.valorSelecionado)
-        : undefined
-    };
-    // Garantir mostrarDI true por padrão
-    if (typeof serviceParams.mostrarDI === 'undefined') {
-      serviceParams.mostrarDI = true;
+this.abastecimentoService
+  .listarEtapas(String(params.empreendimentoId))
+  .subscribe(dados => {
+
+    if (Array.isArray(dados) && dados.length > 0) {
+      this.etapas = dados.map(e => ({
+        id: String(e.id),
+        descricao: e.descricao || e.nome
+      }));
     }
-    this.abastecimentoService.listarEtapas(serviceParams).subscribe(dados => {
-      if (Array.isArray(dados) && dados.length > 0) {
-        this.etapas = dados;
-      } // Se vier vazio, mantém as etapas atuais
-      if (callback) callback();
-    });
-  }
+
+    if (callback) callback();
+  });
+}
 
   carregarInsumos(empreendimentoId: LookupId) {
     if (!empreendimentoId) {
@@ -701,7 +696,7 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
     const valorSel = typeof valorSelecionado !== 'undefined' && valorSelecionado !== null
       ? String(valorSelecionado)
       : '';
-    this.abastecimentoService.listarBlocos(String(empreendimentoId), '', valorSel).subscribe(dados => {
+    this.abastecimentoService.listarBlocosPosto(String(empreendimentoId), '', valorSel).subscribe(dados => {
       this.blocos = dados;
     });
   }

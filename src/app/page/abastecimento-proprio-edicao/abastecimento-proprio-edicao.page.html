@@ -39,7 +39,7 @@
  [lista]="equipamentos"
 campoDescricao="descricao"
 [valorSelecionado]="equipamentoSelecionado"
-(selecionado)="equipamentoSelecionado = $event?.id"
+(selecionado)="selecionarEquipamento($event)"
     >
   </app-autocomplete>
 </div>
@@ -80,55 +80,50 @@ campoDescricao="descricao"
       <!-- Bomba / Bico e Destino (ainda sem API, por enquanto só layout) -->
       <div class="abp-group-row">
         <div class="abp-field abp-half">
-<label>Bomba / Bico</label>
-<app-autocomplete
-  [lista]="bicos"
-  campoDescricao="descricao"
-  [valorSelecionado]="bicoSelecionado"
-  (selecionado)="bicoSelecionado = $event?.id">
-</app-autocomplete>
+          <label class="abp-label">Bomba / Bico</label>
+          <app-autocomplete
+            [lista]="bicos"
+            campoDescricao="descricao"
+            [valorSelecionado]="bicoSelecionado"
+            (selecionado)="onBicoChange($event?.id)">
+          </app-autocomplete>
         </div>
-
         <div class="abp-field abp-half">
           <label class="abp-label">Destino</label>
-<app-autocomplete
-  [lista]="destinos"
-  campoDescricao="destinoDesc"
-  [valorSelecionado]="destinoSelecionado"
-  [disabled]="destinoTravado"
-  (selecionado)="selecionarDestino($event)">
-</app-autocomplete>
+            <app-autocomplete
+              [lista]="destinos"
+              campoDescricao="descricao"
+              [valorSelecionado]="destinoSelecionado"
+              [disabled]="destinoTravado"
+              (selecionado)="selecionarDestino($event)">
+            </app-autocomplete>
         </div>
       </div>
 
       <!-- Empreendimento / Etapa -->
       <div class="abp-group-row">
-<!-- Empreendimento -->
-<div class="abp-field abp-half">
-  <label class="abp-label">Empreendimento</label>
-
-<!-- Empreendimento -->
-<app-autocomplete
-  [lista]="empreendimentos"
-  campoDescricao="descricao"
-  [valorSelecionado]="empreendimentoSelecionado"
-  [disabled]="!!equipamentoSelecionado"
-  (selecionado)="selecionarEmpreendimento($event)">
-</app-autocomplete>
-</div>
+        <div class="abp-field abp-half">
+          <label class="abp-label">Empreendimento</label>
+        <app-autocomplete
+          [lista]="empreendimentos"
+          campoDescricao="descricao"
+          [valorSelecionado]="empreendimentoSelecionado"
+          [disabled]="!!equipamentoSelecionado"
+          (selecionado)="selecionarEmpreendimento($event)">
+        </app-autocomplete>
+        </div>
 
 
         <div class="abp-field abp-half">
-         
           <label class="abp-label">Etapa</label>
-       <app-autocomplete
-  [lista]="etapas"
-  campoDescricao="descricao"
-  [valorSelecionado]="etapaSelecionada"
-  (selecionado)="selecionarEtapa($event)">
-</app-autocomplete>
-        </div>
-      </div>
+          <app-autocomplete
+              [lista]="etapas"
+              campoDescricao="descricao"
+              [valorSelecionado]="etapaSelecionada"
+              (selecionado)="selecionarEtapa($event)">
+            </app-autocomplete>
+            </div>
+          </div>
 
       <!-- Odômetro -->
     <div class="abp-group-row">
@@ -204,12 +199,13 @@ campoDescricao="descricao"
   <div class="abp-field abp-half">
     <label class="abp-label">Aplicação</label>
 
-    <app-autocomplete
-      [lista]="aplicacoes"
-      campoDescricao="aplicacaoDescr"
-      [valorSelecionado]="aplicacaoSelecionada"
-      (selecionado)="selecionarAplicacao($event)">
-    </app-autocomplete>
+<app-autocomplete
+  [lista]="aplicacoes"
+ campoDescricao="descricao"
+  [valorSelecionado]="aplicacaoSelecionada"
+  [disabled]="!aplicacaoHabilitada"
+  (selecionado)="selecionarAplicacao($event)">
+</app-autocomplete>
   </div>
 
 </div>
@@ -254,22 +250,22 @@ campoDescricao="descricao"
   <label class="abp-label">Motorista / Operador</label>
 
   <app-autocomplete
-    [lista]="motoristasOperadores"
-    campoDescricao="colaboradorNome"
-    [valorSelecionado]="motoristaOperadorSelecionado"
-    (selecionado)="selecionarMotoristaOperador($event)">
-  </app-autocomplete>
+  [lista]="motoristasOperadores"
+  campoDescricao="colaboradorNome"
+  [valorSelecionado]="motoristaOperadorSelecionado"
+  (selecionado)="selecionarMotoristaOperador($event)">
+</app-autocomplete>
 </div>
 
      <div class="abp-field abp-half">
   <label class="abp-label">Colaborador / Frentista</label>
 
-  <app-autocomplete
-    [lista]="colaboradoresFrentista"
-    campoDescricao="descricao"
-    [valorSelecionado]="colaboradorFrentistaSelecionado"
-    (selecionado)="selecionarColaboradorFrentista($event)">
-  </app-autocomplete>
+<app-autocomplete
+  [lista]="colaboradoresFrentista"
+  campoDescricao="descricao"
+  [valorSelecionado]="colaboradorFrentistaSelecionado"
+  (selecionado)="colaboradorFrentistaSelecionado = $event?.id">
+</app-autocomplete>
 </div>
       </div>
 
@@ -285,15 +281,16 @@ campoDescricao="descricao"
   />
 </div>
 
-     <div class="abp-field abp-half">
+<div class="abp-field abp-half">
   <label class="abp-label">Bloco</label>
 
   <app-autocomplete
     [lista]="blocos"
-    campoDescricao="nomeBloco"
+    campoDescricao="descricao"
     [valorSelecionado]="blocoSelecionado"
     (selecionado)="selecionarBloco($event)">
   </app-autocomplete>
+
 </div>
       </div>
 
