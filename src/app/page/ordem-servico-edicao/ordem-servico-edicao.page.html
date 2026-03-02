@@ -39,18 +39,20 @@
         <div class="os-field">
           <label class="os-label">Descrição</label>
         <input
-          type="text"
-          class="os-input os-uppercase"
-          name="descricao"
-          [(ngModel)]="descricao"
-          (input)="descricao = descricao.toUpperCase()"
+           type="text"
+           class="os-input os-uppercase"
+           name="descricao"
+           [(ngModel)]="descricao"
+           (input)="descricao = descricao.toUpperCase()"
+           placeholder="Digite a descrição"
+           title="Descrição da ordem de serviço"
         />
         </div>
 
 <!-- EQUIPAMENTO -->
 <div class="os-field">
   <label class="os-label">Equipamento</label>
-  
+
   <app-autocomplete
     [lista]="equipamentosLista"
     [valorSelecionado]="equipamento"
@@ -191,10 +193,12 @@
   <div class="os-group-half">
     <label class="os-label">Hodômetro</label>
     <input
-  class="os-input"
-  type="number"
-  [(ngModel)]="hodometro"
-  name="hodometro"
+    class="os-input"
+    type="number"
+    [(ngModel)]="hodometro"
+    name="hodometro"
+    placeholder="Informe o hodômetro"
+    title="Hodômetro"
 />
   </div>
 
@@ -205,6 +209,8 @@
   type="number"
   [(ngModel)]="horimetro"
   name="horimetro"
+  placeholder="Informe o horímetro"
+  title="Horímetro"
 />
   </div>
 </div>
@@ -240,25 +246,31 @@
        <textarea
         class="os-textarea-native"
         [(ngModel)]="defeitosConstatados"
-        name="defeitosConstatados">
+        name="defeitosConstatados"
+        placeholder="Descreva os defeitos constatados"
+        title="Defeitos constatados">
        </textarea>
         </div>
 
       <div class="os-field">
         <label class="os-label">Causas Prováveis</label>
       <textarea
-        class="os-textarea-native"
-        [(ngModel)]="causasProvaveis"
-        name="causasProvaveis">
+          class="os-textarea-native"
+          [(ngModel)]="causasProvaveis"
+          name="causasProvaveis"
+          placeholder="Descreva as causas prováveis"
+          title="Causas prováveis">
       </textarea>
       </div>
 
       <div class="os-field">
         <label class="os-label">Observações</label>
         <textarea
-          class="os-textarea-native"
-          [(ngModel)]="observacoes"
-          name="observacoes">
+           class="os-textarea-native"
+           [(ngModel)]="observacoes"
+           name="observacoes"
+           placeholder="Observações adicionais"
+           title="Observações">
         </textarea>
       </div>
 
@@ -281,7 +293,7 @@
         </ng-template>
       </div>
 
-      
+
 <!--ADIÇÃO DOS NOVOS BOTÕES-->
     <div class="os-actions-column">
       <button

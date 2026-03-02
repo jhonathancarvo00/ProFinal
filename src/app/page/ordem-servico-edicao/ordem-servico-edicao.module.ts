@@ -5,6 +5,7 @@ import { IonicModule } from '@ionic/angular';
 import { OrdemServicoEdicaoPageRoutingModule } from './ordem-servico-edicao-routing.module';
 import { OrdemServicoEdicaoPage } from './ordem-servico-edicao.page';
 import { CalendarPopoverComponentModule } from '../../components/calendar-popover/calendar-popover.module';
+import { AutocompleteComponent } from '../../components/autocomplete/autocomplete.component';
 
 @NgModule({
   imports: [
@@ -12,9 +13,10 @@ import { CalendarPopoverComponentModule } from '../../components/calendar-popove
     FormsModule,
     IonicModule,
     OrdemServicoEdicaoPageRoutingModule,
-    CalendarPopoverComponentModule
+    CalendarPopoverComponentModule,
+    AutocompleteComponent
   ],
-  
+
   //declarations: [OrdemServicoEdicaoPage]
 })
 export class OrdemServicoEdicaoPageModule {}
