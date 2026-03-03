@@ -33,7 +33,7 @@ type DestinoDto = {
   destinoDesc?: string;
   destinoid?: string;
 };
-//fazer a chamada dele 
+//fazer a chamada dele
 type EtapaDto = { id: string; descricao: string };
 type InsumoDto = { insumoId: string; insumoDescr: string };
 type AplicacaoDto = { aplicacaoId: string; aplicacaoDescr: string };
@@ -200,7 +200,7 @@ onInsumoChange(value: string | null) {
   this.aplicacaoSelecionada = null;
   this.aplicacoes = [];
   this.aplicacaoHabilitada = false;
-  
+
   this.carregarEtapas();
   this.carregarAplicacoes();
 }
@@ -300,7 +300,7 @@ tiposPrevAbast = [
   observacao: string = '';
   horaAbastecimento: string | null = null;
   carregando = false;
-  
+
 
   // ID do abastecimento para edição
   abastecimentoId: string | null = null;
@@ -316,7 +316,7 @@ tiposPrevAbast = [
     private abastecimentoService: AbastecimentoService,
     private insumoService: InsumoService,
     private toastCtrl: ToastController
-  ) 
+  )
   {
     // Captura os dados passados via state (só funciona no construtor)
     const navigation = this.router.getCurrentNavigation();
@@ -338,13 +338,13 @@ ngOnInit() {
   this.carregarBombas();
   this.carregarMotoristasOperadores();
   this.carregarColaboradoresFrentista();
-  this.carregarEquipamentos(); 
+  this.carregarEquipamentos();
 
   if (!this.abastecimentoId) {
     const hoje = new Date();
     this.data = hoje.toISOString().split('T')[0];
   }
-} 
+}
     limparData(event: Event) {
       event.stopPropagation();
       this.data = null;
@@ -443,7 +443,11 @@ ngOnInit() {
                   if (empreendimentoId) {
                     promises.push(
                       this.abastecimentoService
-                        .listarEtapas(empreendimentoId)
+                        .listarEtapas({
+                          empreendimentoId: String(empreendimentoId),
+                          pesquisa: '',
+                          mostrarDI: true
+                        })
                         .toPromise()
                         .then((etapas: any) => {
 
@@ -575,14 +579,14 @@ this.abastecimentoService.listarBicos(this.bombaSelecionada).subscribe({
 this.abastecimentoService.listarDestinos(this.bombaSelecionada).subscribe({
   next: (destinosApi) => {
       this.destinos = (destinosApi || []).map((d: any) => ({
-        id: d.destino,               
-        descricao: d.destinoDesc,    
-        destinoTipo: d.destinoTipo,  
-        destinoId: d.destinoId,      
+        id: d.destino,
+        descricao: d.destinoDesc,
+        destinoTipo: d.destinoTipo,
+        destinoId: d.destinoId,
         emprdId: d.emprdId,
         emprdCod: d.emprdCod
       }));
-    
+
 
     if (this.equipamentoSelecionado) {
       this.onEquipamentoChange(this.equipamentoSelecionado);
@@ -615,7 +619,7 @@ if (this.bombaSelecionada) {
       this.blocoSelecionado = String(blocoRaw);
     } else {
       this.blocoSelecionado = null;
-    
+
     // Colaborador/Frentista
     const frentistaRaw = this.getItemValue(dados, ['frentistaId', 'idFrentista', 'FrentistaId']);
     this.colaboradorFrentistaSelecionado = (frentistaRaw && frentistaRaw !== guidZerado) ? frentistaRaw : null;
@@ -789,7 +793,7 @@ private testarEmpreendimentosComBlocos(): void {
 
 private carregarEmpreendimentoPorBomba(emprdId: string) {
 
-  
+
 
   if (!emprdId) {
     this.empreendimentos = [];
@@ -805,7 +809,7 @@ private carregarEmpreendimentoPorBomba(emprdId: string) {
         this.empreendimentos = (emps || []).map(e => ({
           id: String(e.id),
           descricao: e.descricao || e.nome,
-          emprdCod: Number(e.codigo) 
+          emprdCod: Number(e.codigo)
         }));
 
         setTimeout(() => {
@@ -907,7 +911,7 @@ private carregarUltimoNumeroBico() {
   this.abastecimentoService
     .consultarUltimoNumeroBico(
       this.bombaSelecionada,
-      this.bicoSelecionado 
+      this.bicoSelecionado
     )
 .subscribe({
   next: (retorno: any) => {
@@ -979,7 +983,11 @@ private carregarEtapas() {
   }
 
   this.abastecimentoService
-    .listarEtapas(this.empreendimentoSelecionado)
+    .listarEtapas({
+      empreendimentoId: String(this.empreendimentoSelecionado),
+      pesquisa: '',
+      mostrarDI: true
+    })
     .subscribe({
       next: (response: any[]) => {
 
@@ -1013,7 +1021,7 @@ private carregarAplicacoes() {
 
         this.aplicacoes = (res || []).map(a => ({
           id: a.aplicacaoId,
-          descricao: a.aplicacaoDescr   
+          descricao: a.aplicacaoDescr
         }));
 
         this.aplicacaoHabilitada = this.aplicacoes.length > 0;
@@ -1052,7 +1060,7 @@ private carregarAplicacoes() {
       // Validar se a data não é futura
       const dataSelecionada = new Date(data.date);
       const hoje = new Date();
-      hoje.setHours(23, 59, 59, 999); 
+      hoje.setHours(23, 59, 59, 999);
 
       if (dataSelecionada > hoje) {
         this.toast('⚠️ Data não pode ser futura!', 'warning');
@@ -1123,8 +1131,8 @@ private padronizarLista(lista: any[], idField: string, descField: string) {
   this.abastecimentoService.listarBicos(bombaId).subscribe({
     next: (bicos: any[]) => {
       this.bicos = (bicos || []).map(b => ({
-        id: b.bicoId,           
-        codigo: b.bicoCdg,     
+        id: b.bicoId,
+        codigo: b.bicoCdg,
         descricao: b.bicoDescricao
       }));
     },
@@ -1137,13 +1145,13 @@ private carregarEquipamentos() {
   this.abastecimentoService.listarEquipamentosMobile().subscribe({
     next: (eqps: any[]) => {
       this.equipamentos = eqps.map(e => ({
-        id: e.id,              
-        descricao: e.descricao 
+        id: e.id,
+        descricao: e.descricao
       }));
     },
     error: () => {},
   });
-  
+
 }
 
 
@@ -1276,9 +1284,9 @@ if (!this.blocoSelecionado) {
   this.toast('Bloco é obrigatório para aplicação do insumo', 'warning');
   return;
 }
-  
+
 */
-  
+
 
 // backend está exigindo
 if (!this.tipoPrevAbast) {
@@ -1299,8 +1307,8 @@ const params: Record<string, unknown> = {
   IdInsumo: this.insumoSelecionado,
   QtdInsumo: Number(this.quantidade),
   Origem: 3,
-  
-  
+
+
 TipoPrevAbast: this.tipoPrevAbast ?? undefined,
 
 //IdBloco: this.blocoSelecionado,

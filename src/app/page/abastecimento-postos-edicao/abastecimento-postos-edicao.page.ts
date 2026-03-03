@@ -144,7 +144,7 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
     this.resolverEmpresaPendente();
     this.resolverEmpreendimentoPendenteECarregarDependencias();
     if (this.isGuid(this.empreendimento)) {
-      this.carregarEtapas({ empreendimentoId: this.empreendimento, valorSelecionado: this.etapa ?? undefined });
+      this.carregarEtapas({ empreendimentoId: this.empreendimento });
       this.carregarInsumos(this.empreendimento);
       this.carregarBlocos(this.empreendimento, this.bloco ?? undefined);
     }
@@ -171,7 +171,7 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
           this.resolverEmpresaPendente();
           this.resolverEmpreendimentoPendenteECarregarDependencias();
           if (this.isGuid(this.empreendimento)) {
-            this.carregarEtapas({ empreendimentoId: this.empreendimento, valorSelecionado: this.etapa ?? undefined });
+            this.carregarEtapas({ empreendimentoId: this.empreendimento });
             this.carregarInsumos(this.empreendimento);
             this.carregarBlocos(this.empreendimento, this.bloco ?? undefined);
           }
@@ -260,7 +260,7 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
     if (encontrado?.id) {
       this.empreendimento = encontrado.id;
       // Agora que temos GUID, carrega dependências
-      this.carregarEtapas({ empreendimentoId: this.empreendimento, valorSelecionado: this.etapa ?? undefined });
+      this.carregarEtapas({ empreendimentoId: this.empreendimento });
       this.carregarInsumos(this.empreendimento);
       this.carregarBlocos(this.empreendimento, this.bloco ?? undefined);
     }
@@ -578,10 +578,12 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
 
   onEmpreendimentoChange(empreendimentoId: LookupId) {
     this.empreendimento = empreendimentoId;
+    this.etapa = null; // Limpa etapa anterior
+    this.insumo = null; // Limpa insumo anterior
     this.centroDespesas = null; // Limpa seleção
     this.carregarCentrosDespesas(this.planoContasPadraoId ?? undefined);
     // Sempre carregar etapas apenas do empreendimento ao trocar empreendimento
-    this.carregarEtapas({ empreendimentoId: this.empreendimento }, () => {
+    this.carregarEtapas({ empreendimentoId }, () => {
       this.carregarInsumos(empreendimentoId);
       this.carregarBlocos(empreendimentoId);
     });
@@ -648,29 +650,50 @@ export class AbastecimentoPostosEdicaoPage implements OnInit {
   }
 
   carregarEtapas(
-    params: { empreendimentoId: LookupId; mostrarDI?: boolean; insumoId?: LookupId; valorSelecionado?: LookupId },
+    params: { empreendimentoId: LookupId; mostrarDI?: boolean; insumoId?: LookupId },
     callback?: () => void
   ) {
     if (!params.empreendimentoId) {
+      console.log('[DEBUG] carregarEtapas: empreendimentoId vazio');
       this.etapas = [];
       if (callback) callback();
       return;
     }
 
-this.abastecimentoService
-  .listarEtapas(String(params.empreendimentoId))
-  .subscribe(dados => {
+    console.log('[DEBUG] carregarEtapas: iniciando com', params);
 
-    if (Array.isArray(dados) && dados.length > 0) {
-      this.etapas = dados.map(e => ({
-        id: String(e.id),
-        descricao: e.descricao || e.nome
-      }));
-    }
+    const serviceParams = {
+      empreendimentoId: String(params.empreendimentoId),
+      pesquisa: '',
+      mostrarDI: params.mostrarDI || true,
+      insumoId: typeof params.insumoId !== 'undefined' && params.insumoId !== null
+        ? String(params.insumoId)
+        : undefined
+    };
 
-    if (callback) callback();
-  });
-}
+    console.log('[DEBUG] carregarEtapas: serviceParams', serviceParams);
+
+    this.abastecimentoService
+      .listarEtapas(serviceParams)
+      .subscribe(
+        dados => {
+          console.log('[DEBUG] carregarEtapas: resposta do backend', dados);
+          if (Array.isArray(dados) && dados.length > 0) {
+            this.etapas = dados;
+            console.log('[DEBUG] carregarEtapas: etapas carregadas', this.etapas.length);
+          } else {
+            this.etapas = [];
+            console.log('[DEBUG] carregarEtapas: nenhuma etapa retornada');
+          }
+          if (callback) callback();
+        },
+        error => {
+          console.error('[DEBUG] carregarEtapas: erro', error);
+          this.etapas = [];
+          if (callback) callback();
+        }
+      );
+  }
 
   carregarInsumos(empreendimentoId: LookupId) {
     if (!empreendimentoId) {
@@ -696,7 +719,7 @@ this.abastecimentoService
     const valorSel = typeof valorSelecionado !== 'undefined' && valorSelecionado !== null
       ? String(valorSelecionado)
       : '';
-    this.abastecimentoService.listarBlocosPosto(String(empreendimentoId), '', valorSel).subscribe(dados => {
+    this.abastecimentoService.listarBlocos(String(empreendimentoId), '', valorSel).subscribe(dados => {
       this.blocos = dados;
     });
   }
@@ -768,7 +791,11 @@ this.abastecimentoService
     }
 
     // Validação do Centro de Despesa
-    const centroDespesaSelecionado = this.centrosDespesas.find(cd => this.getCentroDespesaValue(cd) === String(this.centroDespesas));
+    if (!this.centrosDespesas || !Array.isArray(this.centrosDespesas)) {
+      alert('Centro de Despesa não carregado');
+      return;
+    }
+    const centroDespesaSelecionado = this.centrosDespesas.find(cd => this.getCentroDespesaValue(cd) === String(this.centroDespesas ?? ''));
 
     if (!this.centroDespesas || !centroDespesaSelecionado) {
       alert('Selecione um Centro de Despesa válido antes de confirmar!');
@@ -790,31 +817,30 @@ this.abastecimentoService
     const qtd = qtdNum;
     const total = totalNum;
     // Corrigir envio do bloco zerado
-    let blocoValido = this.bloco;
-    if (!blocoValido || blocoValido === '00000000-0000-0000-0000-000000000000') {
+    let blocoValido = this.bloco ?? null;
+    if (blocoValido === '00000000-0000-0000-0000-000000000000') {
       blocoValido = null;
     }
       const payload: Record<string, unknown> = {
         TpAbastecimento: 1,
-        DataAbastecimento: dataFormatada, // Corrigido para o nome correto e formato ISO
-        IdFornecedor: this.fornecedor,
-        IdEquipamento: this.equipamento,
-        IdEmprd: this.empreendimento,
-        IdEmpresa: this.empresa,
-        IdCentroDespesa: this.centroDespesas,
-        IdEtapa: this.etapa,
-        IdInsumo: this.insumo,
-        IdBloco: blocoValido,
+        DataAbastecimento: dataFormatada,
+        IdFornecedor: this.fornecedor ?? null,
+        IdEquipamento: this.equipamento ?? null,
+        IdEmprd: this.empreendimento ?? null,
+        IdEmpresa: this.empresa ?? null,
+        IdCentroDespesa: this.centroDespesas ?? null,
+        IdEtapa: this.etapa ?? null,
+        IdInsumo: this.insumo ?? null,
+        IdBloco: blocoValido ?? null,
         QtdInsumo: qtd,
         TotalAbastecimentoPosto: total,
         Origem: 3,
-        Observacao: this.observacao,
-        Odometro: this.hodometro,
-        Horimetro: this.horimetro,
-        NumeroControlePosto: this.numeroControlePosto,
-        Retorno: this.retorno ? 1 : 0,
-        Estoque: this.estoque ? 1 : 0,
-        // Adicione outros campos opcionais conforme necessário
+        Observacao: this.observacao ?? '',
+        Odometro: this.hodometro ?? null,
+        Horimetro: this.horimetro ?? null,
+        NumeroControlePosto: this.numeroControlePosto ?? ''  ,
+        Retorno: (this.retorno ?? true) ? 1 : 0,
+        Estoque: (this.estoque ?? false) ? 1 : 0,
       };
     // Se estiver editando, incluir o AbastecimentoId no payload
     if (this.ultimoAbastecimentoIdCarregado) {

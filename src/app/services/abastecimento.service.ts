@@ -459,12 +459,19 @@ listarDestinos(bombaId: string) {
   }
 
   // Etapas (por empreendimento)
-listarEtapas(empreendimentoId: string) {
-
-  const body = {
-    pesquisa: empreendimentoId,  // STRING
-    mostrarDI: false
+listarEtapas(params: {
+  empreendimentoId: string;
+  pesquisa?: string;
+  mostrarDI?: boolean;
+  insumoId?: string;
+}) {
+  const body: Record<string, unknown> = {
+    pesquisa: params.pesquisa || '',
+    empreendimentoId: params.empreendimentoId,
+    mostrarDI: typeof params.mostrarDI !== 'undefined' ? params.mostrarDI : true
   };
+  if (params.insumoId) body['insumoId'] = params.insumoId;
+  console.log('[DEBUG] listarEtapas enviando:', body);
 
   return this.api.post<any[]>(
     '/api/orcamentos/Lookups/Etapas',
@@ -502,6 +509,19 @@ listarFornecedores(pesquisa: string = '', valorSelecionado: string = '') {
   );
 }
   // Blocos (por empreendimento)
+  listarBlocos(empreendimentoId: string, pesquisa: string = '', valorSelecionado: string = '') {
+    const body: Record<string, unknown> = {
+      pesquisa,
+      valorSelecionado,
+      empreendimentoId
+    };
+    return this.api.post<LookupItem[]>(
+      '/api/cadastros/Lookups/Blocos',
+      body
+    );
+  }
+
+  // Blocos (por empreendimento) - Abastecimento Próprio/Legado
 listarBlocosProprio(empreendimentoId: string) {
   return this.api.post(
     '/api/cadastros/Lookups/Unidades',

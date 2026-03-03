@@ -9,6 +9,7 @@
     (input)="filtrar()"
     (blur)="fecharComDelay()"
     [placeholder]="placeholder"
+    [disabled]="disabled"
   />
 
   <!-- BOTÃO LIMPAR -->
@@ -21,8 +22,10 @@
   </button>
 
   <!-- LISTA -->
-  <div class="dropdown" *ngIf="aberto && listaFiltrada.length">
-
+  <div class="dropdown" *ngIf="aberto">
+    <div *ngIf="!listaFiltrada.length" class="no-items">
+      Nenhuma opção disponível
+    </div>
     <div
       class="item"
       *ngFor="let item of listaFiltrada"
@@ -31,6 +34,5 @@
     >
       {{ getDescricao(item) }}
     </div>
-
   </div>
 </div>
