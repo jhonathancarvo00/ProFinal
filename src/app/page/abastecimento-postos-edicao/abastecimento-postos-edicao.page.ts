@@ -824,7 +824,7 @@ this.abastecimentoService
     Object.keys(payload).forEach(key => (payload[key] === null || payload[key] === undefined) && delete payload[key]);
     // Chamar service para gravar
 
-console.log('PAYLOAD ENVIADO:', payload); 
+console.log('PAYLOAD ENVIADO:', payload);
 
     this.abastecimentoService.gravarAbastecimento(payload).subscribe({
       next: (res) => {
