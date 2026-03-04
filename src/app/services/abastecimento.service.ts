@@ -254,12 +254,15 @@ listarBlocosPosto(
   }
 
 consultarAplicacaoPrev(equipamentoId: string, insumoId: string) {
+  const params = {
+    EquipamentoId: equipamentoId,
+    InsumoId: insumoId
+  };
+  console.log('[DEBUG] consultarAplicacaoPrev enviando:', params);
+
   return this.api.get<any[]>(
     '/api/frotas/Abastecimentos/ConsultaAplicacaoPrevEquipInsumo',
-    {
-      EquipamentoId: equipamentoId,
-      InsumoId: insumoId
-    }
+    params
   );
 }
 
@@ -350,8 +353,16 @@ listarColaboradoresFrentista() {
       map((res: any) => {
         const norm = normalizeNulls(res);
         if (Array.isArray(norm)) {
-          // Garante que só retorna o registro com o ID solicitado
-          return norm.find((item: any) => item.abastecimentoId === abastecimentoId) || norm[0] || null;
+          const alvo = String(abastecimentoId || '').toLowerCase();
+          return norm.find((item: any) => {
+            const itemId = String(
+              item?.abastecimentoId ??
+              item?.AbastecimentoId ??
+              item?.idAbastecimento ??
+              ''
+            ).toLowerCase();
+            return itemId === alvo;
+          }) || norm[0] || null;
         }
         return norm;
       })
@@ -462,16 +473,29 @@ listarDestinos(bombaId: string) {
 listarEtapas(params: {
   empreendimentoId: string;
   pesquisa?: string;
+  valorSelecionado?: string;
   mostrarDI?: boolean;
   insumoId?: string;
+  emprdCod?: string | number;  // Código numérico do empreendimento (fallback)
 }) {
   const body: Record<string, unknown> = {
     pesquisa: params.pesquisa || '',
+    valorSelecionado: params.valorSelecionado || '',
     empreendimentoId: params.empreendimentoId,
-    mostrarDI: typeof params.mostrarDI !== 'undefined' ? params.mostrarDI : true
+    mostrarDI: typeof params.mostrarDI !== 'undefined' ? params.mostrarDI : true,
+    requisito: false  // Campo obrigatório pela API
   };
-  if (params.insumoId) body['insumoId'] = params.insumoId;
-  console.log('[DEBUG] listarEtapas enviando:', body);
+
+  // Fallback legado opcional
+  if (params.emprdCod !== undefined && params.emprdCod !== null) {
+    body['emprdCod'] = params.emprdCod;
+    console.log('[DEBUG] listarEtapas COM emprdCod:', params.emprdCod);
+  }
+
+  if (params.insumoId) {
+    body['insumoId'] = params.insumoId;
+  }
+  console.log('[DEBUG] listarEtapas BODY COMPLETO:', JSON.stringify(body, null, 2));
 
   return this.api.post<any[]>(
     '/api/orcamentos/Lookups/Etapas',
