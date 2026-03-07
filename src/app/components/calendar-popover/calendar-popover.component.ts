@@ -57,4 +57,8 @@ export class CalendarPopoverComponent implements AfterViewInit {
       this.activeDateValue = newDateISO;
     }
   }
+
+  limparData() {
+    this.popoverCtrl.dismiss({ date: null, cleared: true });
+  }
 }

@@ -287,15 +287,15 @@
 
 
 .numero-os-disabled {
-  --color: #9aa3af;          // texto cinza
+  --color: #1f2d3d;          // texto com maior destaque
   --placeholder-color: #cbd5e1;
   --highlight-color-focused: transparent; // remove linha verde
   --border-color: #e5e7eb;
 
-  opacity: 0.9;
-  font-weight: 600;
-
-    font-weight: 600;
+  opacity: 1;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.2px;
 
   /* 👇 espaço interno à esquerda do número */
   --padding-start: 12px;
@@ -330,6 +330,12 @@
   opacity: 1;
 }
 
+.btn-anexar-foto[disabled] {
+  --background: #eef2f7;
+  --color: #9aa7b8;
+  opacity: 1;
+}
+
 
 /* ===== MODAL FOTO PADRÃO ===== */
 
@@ -344,57 +350,80 @@
   display: flex;
   justify-content: center;
 
-  align-items: flex-start;
-  padding-top: 80px;
-  padding-bottom: 40px;
+  align-items: center;
+  padding: 22px 12px;
 }
 
 /* card centralizado */
 .os-foto-modal-card {
-  width: 90%;
-  max-width: 420px;
+  width: min(94vw, 420px);
   background: #ffffff;
   border-radius: 18px;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
-  padding: 20px 18px 22px;
+  padding: 14px 14px 16px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
+}
+
+.os-foto-frame {
+  width: 100%;
+  min-height: 260px;
+  max-height: 62vh;
+  border-radius: 12px;
+  border: 1px solid #dde5f2;
+  background: #f9fbff;
+  padding: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* imagem maior */
 .os-foto-modal-img {
   width: 100%;
-  max-height: 300px;
+  max-height: calc(62vh - 20px);
   object-fit: contain;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
 }
 
-/* botão principal azul padrão */
-.os-primary-btn {
+
+.os-foto-actions {
   width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.os-modal-close-btn {
+  flex: 1;
+  min-height: 40px;
   border: none;
-  border-radius: 24px;
-  padding: 12px;
+  border-radius: 20px;
+  padding: 10px 12px;
 
   background: linear-gradient(135deg, #4c8dff, #2d6fb1);
   color: #fff;
   font-weight: 600;
+  letter-spacing: 0.3px;
 }
 
-/* botão secundário igual padrão do app */
-.os-secondary-btn {
-  width: 100%;
-  border: none;
-  border-radius: 24px;
-  padding: 12px;
 
-  background: #e4f1ff;
-  color: #2d6fb1;
-  font-weight: 600;
+.os-modal-delete-btn {
+  flex: 0 0 auto;
+  min-height: 32px;
+  border: 1px solid #d8e1ef;
+  border-radius: 16px;
+  padding: 6px 10px;
+
+  background: #ffffff;
+  color: #6f7f95;
+  font-weight: 500;
+  font-size: 12px;
 }
 /* Remove qualquer highlight verde padrão do Ionic */
 ion-input {

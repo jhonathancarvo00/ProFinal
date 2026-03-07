@@ -15,8 +15,14 @@
 <ion-content [fullscreen]="true" class="os-content">
   <div class="os-page">
 
+    <!-- Indicador de carregamento -->
+    <div *ngIf="carregando" class="os-loading">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Buscando no servidor...</p>
+    </div>
+
     <!-- Lista de OS -->
-    <ng-container *ngIf="listaOs?.length; else semResultado">
+    <ng-container *ngIf="!carregando && listaOs?.length; else semResultado">
 
       <div class="os-card" *ngFor="let os of listaOs">
 
@@ -58,7 +64,7 @@
 
     <!-- Estado vazio -->
     <ng-template #semResultado>
-      <div class="os-empty">
+      <div *ngIf="!carregando" class="os-empty">
         <p>Nenhuma Ordem de Serviço encontrada.</p>
       </div>
     </ng-template>

@@ -76,6 +76,8 @@ export class OrdemServicoService {
     osId?: string | null;
     empreendimentoId?: string | null;
     equipamentoId?: string | null;
+    causaIntervencaoId?: string | null;
+    manutentorId?: string | null;
     status?: string | null;
     dataInicial?: string | null;
     dataFinal?: string | null;
@@ -84,6 +86,8 @@ export class OrdemServicoService {
     if (filtros.osId) params.OsId = filtros.osId;
     if (filtros.empreendimentoId) params.EmpreendimentoId = filtros.empreendimentoId;
     if (filtros.equipamentoId) params.EquipamentoId = filtros.equipamentoId;
+    if (filtros.causaIntervencaoId) params.CausaIntervencaoId = filtros.causaIntervencaoId;
+    if (filtros.manutentorId) params.ManutentorId = filtros.manutentorId;
     if (filtros.status) params.Status = filtros.status;
     if (filtros.dataInicial) params.DataInicial = filtros.dataInicial;
     if (filtros.dataFinal) params.DataFinal = filtros.dataFinal;

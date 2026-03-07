@@ -39,6 +39,7 @@
         <label class="os-label">Empreendimento</label>
         <app-autocomplete
           [lista]="empreendimentosLista"
+          placeholder="Selecione um empreendimento"
           campoDescricao="descricao"
           (selecionado)="onEmpreendimentoSelecionado($event)">
         </app-autocomplete>
@@ -48,6 +49,7 @@
         <label class="os-label">Equipamento</label>
         <app-autocomplete
           [lista]="equipamentosLista"
+          placeholder="Selecione um equipamento"
           campoDescricao="descricao"
           (selecionado)="onEquipamentoSelecionado($event)">
         </app-autocomplete>
@@ -57,6 +59,7 @@
         <label class="os-label">Causa Intervenção</label>
         <app-autocomplete
           [lista]="causasLista"
+          placeholder="Selecione uma causa"
           campoDescricao="descricao"
           (selecionado)="onCausaSelecionada($event)">
         </app-autocomplete>
@@ -64,12 +67,12 @@
 
       <div class="os-field">
         <label class="os-label">Manutentor</label>
-<app-autocomplete
-  [lista]="manutentoresLista"
-  placeholder=""
-  campoDescricao="colaboradorNome"
-  (selecionado)="onManutentorSelecionado($event)">
-</app-autocomplete>
+        <app-autocomplete
+          [lista]="manutentoresLista"
+          placeholder="Selecione um manutentor"
+          campoDescricao="colaboradorNome"
+          (selecionado)="onManutentorSelecionado($event)">
+        </app-autocomplete>
       </div>
 
       <!-- Status -->
@@ -78,7 +81,7 @@
 
   <app-autocomplete
     [lista]="statusLista"
-    placeholder=""
+    placeholder="Selecione um status"
     campoDescricao="descricao"
     (selecionado)="onStatusSelecionado($event)">
   </app-autocomplete>

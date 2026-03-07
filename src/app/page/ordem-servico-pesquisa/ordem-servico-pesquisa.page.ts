@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { OrdemServicoService } from '../../services/ordem-servico.service';
 
 export interface OrdemServicoListaItem {
-  osId?: string; 
+  osId?: string;
   osCod: string;
   osDescricao: string;
   equipCod: string;
@@ -50,7 +50,7 @@ export class OrdemServicoPesquisaPage implements OnInit {
 
   private aplicarFiltrosLocal(dados: any[], filtros: {
 
-    
+
 
     numeroOs?: string;
     empreendimento?: string;
@@ -65,8 +65,6 @@ export class OrdemServicoPesquisaPage implements OnInit {
   }): any[] {
     let lista = Array.isArray(dados) ? [...dados] : [];
 
-      console.log('Valor filtro empreendimento:', filtros.empreendimento);
-
     const numeroRaw = (filtros.numeroOs || '').trim();
     if (numeroRaw) {
       const digits = (numeroRaw.match(/\d+/g) || []).join('');
@@ -78,16 +76,29 @@ export class OrdemServicoPesquisaPage implements OnInit {
       if (texto) {
         lista = lista.filter(item => String(item?.osDescricao ?? item?.Descricao ?? '').toLowerCase().includes(texto));
       }
-     
+
     }
 
-    const equipamentoTxt = (filtros.equipamento || '').trim().toLowerCase();
-    if (equipamentoTxt && !this.isGuid(equipamentoTxt)) {
-      lista = lista.filter(item => {
-        const cod = String(item?.equipCod ?? '').toLowerCase();
-        const ident = String(item?.equipIndentificador ?? '').toLowerCase();
-        return cod.includes(equipamentoTxt) || ident.includes(equipamentoTxt);
-      });
+    // ===============================
+    // 🔎 FILTRO EQUIPAMENTO
+    // ===============================
+    const equipamentoValor = (filtros.equipamento || '').trim();
+    if (equipamentoValor) {
+      if (this.isGuid(equipamentoValor)) {
+        // Filtro por GUID (selecionado da lista)
+        lista = lista.filter(item => {
+          const equipId = String(item?.equipId ?? item?.equipamentoId ?? item?.EquipamentoId ?? '');
+          return equipId === equipamentoValor;
+        });
+      } else {
+        // Filtro por texto livre
+        const equipamentoTxt = equipamentoValor.toLowerCase();
+        lista = lista.filter(item => {
+          const cod = String(item?.equipCod ?? '').toLowerCase();
+          const ident = String(item?.equipIndentificador ?? '').toLowerCase();
+          return cod.includes(equipamentoTxt) || ident.includes(equipamentoTxt);
+        });
+      }
     }
 /*
     const empreendimentoTxt = (filtros.empreendimento || '').trim().toLowerCase();
@@ -120,21 +131,47 @@ if (empreendimentoValor) {
   });
 }
 
-    const causaTxt = (filtros.causaIntervencao || '').trim().toLowerCase();
-    if (causaTxt && !this.isGuid(causaTxt)) {
-      lista = lista.filter(item => {
-        const descr = String(item?.causasDescri ?? item?.obsCausas ?? '').toLowerCase();
-        return descr.includes(causaTxt);
-      });
+    // ===============================
+    // 🔎 FILTRO CAUSA INTERVENÇÃO
+    // ===============================
+    const causaValor = (filtros.causaIntervencao || '').trim();
+    if (causaValor) {
+      if (this.isGuid(causaValor)) {
+        // Filtro por GUID (selecionado da lista)
+        lista = lista.filter(item => {
+          const causaId = String(item?.causasId ?? item?.causaIntervenId ?? item?.causaIntervencaoId ?? '');
+          return causaId === causaValor;
+        });
+      } else {
+        // Filtro por texto livre
+        const causaTxt = causaValor.toLowerCase();
+        lista = lista.filter(item => {
+          const descr = String(item?.causasDescri ?? item?.obsCausas ?? '').toLowerCase();
+          return descr.includes(causaTxt);
+        });
+      }
     }
 
-    const manutentorTxt = (filtros.manutentor || '').trim().toLowerCase();
-    if (manutentorTxt && !this.isGuid(manutentorTxt)) {
-      lista = lista.filter(item => {
-        const nome = String(item?.manutentorNome ?? '').toLowerCase();
-        const cpf = String(item?.manutentorCpfCnpg ?? '').toLowerCase();
-        return nome.includes(manutentorTxt) || cpf.includes(manutentorTxt);
-      });
+    // ===============================
+    // 🔎 FILTRO MANUTENTOR
+    // ===============================
+    const manutentorValor = (filtros.manutentor || '').trim();
+    if (manutentorValor) {
+      if (this.isGuid(manutentorValor)) {
+        // Filtro por GUID (selecionado da lista)
+        lista = lista.filter(item => {
+          const manutentorId = String(item?.manutentorId ?? item?.manutentorResponsavelId ?? item?.fornId ?? '');
+          return manutentorId === manutentorValor;
+        });
+      } else {
+        // Filtro por texto livre
+        const manutentorTxt = manutentorValor.toLowerCase();
+        lista = lista.filter(item => {
+          const nome = String(item?.manutentorNome ?? '').toLowerCase();
+          const cpf = String(item?.manutentorCpfCnpg ?? '').toLowerCase();
+          return nome.includes(manutentorTxt) || cpf.includes(manutentorTxt);
+        });
+      }
     }
 
     const statusRaw = (filtros.status || '').trim();
@@ -226,6 +263,8 @@ if (empreendimentoValor) {
       const numeroDigits = ((filtrosTela.numeroOs || '').match(/\d+/g) || []).join('') || null;
       const empreendimentoTrim = (filtrosTela.empreendimento || '').trim();
       const equipamentoTrim = (filtrosTela.equipamento || '').trim();
+      const causaTrim = (filtrosTela.causaIntervencao || '').trim();
+      const manutentorTrim = (filtrosTela.manutentor || '').trim();
 
 const filtrosApi = {
   osId: (numeroDigits && this.isGuid(numeroDigits)) ? numeroDigits : null,
@@ -238,6 +277,16 @@ const filtrosApi = {
   equipamentoId:
     (equipamentoTrim && this.isGuid(equipamentoTrim))
       ? equipamentoTrim
+      : null,
+
+  causaIntervencaoId:
+    (causaTrim && this.isGuid(causaTrim))
+      ? causaTrim
+      : null,
+
+  manutentorId:
+    (manutentorTrim && this.isGuid(manutentorTrim))
+      ? manutentorTrim
       : null,
 
   status: (filtrosTela.status || '').trim() || null,
@@ -255,6 +304,27 @@ const filtrosApi = {
     listaFiltrada = listaFiltrada.filter(os =>
       String(os.osCod ?? os.NumeroOs ?? '') === String(highlightOs)
     );
+  }
+
+  if (!highlightOs && listaFiltrada.length === 0) {
+    this.carregando = false;
+    this.router.navigate(['/tabs/ordem-servico'], {
+      queryParams: {
+        numeroOs: filtrosTela.numeroOs || '',
+        empreendimento: filtrosTela.empreendimento || '',
+        equipamento: filtrosTela.equipamento || '',
+        causaIntervencao: filtrosTela.causaIntervencao || '',
+        manutentor: filtrosTela.manutentor || '',
+        status: filtrosTela.status || '',
+        dataAberturaInicial: filtrosTela.dataAberturaInicial || '',
+        dataAberturaFinal: filtrosTela.dataAberturaFinal || '',
+        dataConclusaoInicial: filtrosTela.dataConclusaoInicial || '',
+        dataConclusaoFinal: filtrosTela.dataConclusaoFinal || '',
+        semResultado: '1',
+      },
+      replaceUrl: true,
+    });
+    return;
   }
 
   this.listaOs = listaFiltrada.map(mapItem);

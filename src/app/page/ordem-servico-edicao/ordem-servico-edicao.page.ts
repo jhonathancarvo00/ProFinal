@@ -130,6 +130,10 @@ statusLista = [
 ];
   carregando = false;
 
+  get podeAnexarFoto(): boolean {
+    return !!this.osId && this.osId.length === 36;
+  }
+
   private getFotoCacheKeyById(osId: string) {
     return `os:lastFotoDataUrl:id:${osId}`;
   }
@@ -661,6 +665,15 @@ this.ordemService.listarColaboradoresMotoristas().subscribe({
     await popover.present();
     const { data } = await popover.onDidDismiss();
 
+    if (data?.cleared) {
+      if (fieldName === 'dataAbertura') {
+        this.dataAbertura = null;
+      } else {
+        this.dataConclusao = null;
+      }
+      return;
+    }
+
     if (data && data.date) {
       let dateStr: string;
       // Se vier como objeto Date, converte para ISO
@@ -685,10 +698,6 @@ this.ordemService.listarColaboradoresMotoristas().subscribe({
       }
     }
   }
-  /* 🔹 NOVO — limpar data */
-limparData(campo: 'dataAbertura' | 'dataConclusao') {
-  this[campo] = null;
-}
 
   formatDate(isoOrDate: string | null): string {
     // Removido log de debug

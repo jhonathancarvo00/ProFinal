@@ -56,6 +56,7 @@
   <app-autocomplete
     [lista]="equipamentosLista"
     [valorSelecionado]="equipamento"
+    placeholder="Selecione o equipamento"
     campoDescricao="descricao"
     (selecionado)="onEquipamentoSelecionado($event)">
   </app-autocomplete>
@@ -68,6 +69,7 @@
   <app-autocomplete
     [lista]="empreendimentosLista"
     [valorSelecionado]="empreendimento"
+    placeholder="Selecione o empreendimento"
     campoDescricao="descricao"
     (selecionado)="onEmpreendimentoSelecionado($event)">
   </app-autocomplete>
@@ -111,13 +113,6 @@
       </span>
 
       <div class="os-date-icons">
-        <!-- botão limpar -->
-        <ion-icon
-          name="close-circle"
-          *ngIf="dataConclusao"
-          (click)="limparData('dataConclusao'); $event.stopPropagation()"
-        ></ion-icon>
-
         <!-- ícone calendário -->
         <ion-icon name="calendar-outline"></ion-icon>
       </div>
@@ -132,6 +127,7 @@
   <app-autocomplete
     [lista]="classificacoesLista"
     [valorSelecionado]="classificacao"
+    placeholder="Selecione a classificação"
     campoDescricao="descricao"
     (selecionado)="onClassificacaoSelecionada($event)">
   </app-autocomplete>
@@ -144,6 +140,7 @@
   <app-autocomplete
     [lista]="tiposOsLista"
     [valorSelecionado]="tipo"
+    placeholder="Selecione o tipo"
     campoDescricao="descricao"
     (selecionado)="onTipoSelecionado($event)">
   </app-autocomplete>
@@ -156,6 +153,7 @@
   <app-autocomplete
     [lista]="causasIntervencaoLista"
    [valorSelecionado]="causaIntervencao"
+    placeholder="Selecione a causa da intervenção"
     campoDescricao="descricao"
     (selecionado)="onCausaSelecionada($event)">
   </app-autocomplete>
@@ -169,6 +167,7 @@
   <app-autocomplete
     [lista]="motoristasLista"
     [valorSelecionado]="operadorMotorista"
+    placeholder="Selecione o operador/motorista"
     campoDescricao="colaboradorNome"
     (selecionado)="onMotoristaSelecionado($event)">
   </app-autocomplete>
@@ -182,6 +181,7 @@
   <app-autocomplete
     [lista]="empreendimentosLista"
     [valorSelecionado]="empreendimentoIntervencao"
+    placeholder="Selecione o empreendimento da intervenção"
     campoDescricao="descricao"
     (selecionado)="onEmpreendimentoIntervSelecionado($event)">
   </app-autocomplete>
@@ -197,7 +197,7 @@
     type="number"
     [(ngModel)]="hodometro"
     name="hodometro"
-    placeholder="Informe o hodômetro"
+    placeholder="Digite o hodômetro"
     title="Hodômetro"
 />
   </div>
@@ -209,7 +209,7 @@
   type="number"
   [(ngModel)]="horimetro"
   name="horimetro"
-  placeholder="Informe o horímetro"
+  placeholder="Digite o horímetro"
   title="Horímetro"
 />
   </div>
@@ -222,6 +222,7 @@
   <app-autocomplete
     [lista]="statusLista"
    [valorSelecionado]="statusCodigo"
+    placeholder="Selecione o status"
     campoDescricao="descricao"
     (selecionado)="onStatusSelecionado($event)">
   </app-autocomplete>
@@ -235,6 +236,7 @@
   <app-autocomplete
     [lista]="manutentoresLista"
     [valorSelecionado]="manutentor"
+    placeholder="Selecione o manutentor"
     campoDescricao="colaboradorNome"
     (selecionado)="onManutentorSelecionado($event)">
   </app-autocomplete>
@@ -247,7 +249,7 @@
         class="os-textarea-native"
         [(ngModel)]="defeitosConstatados"
         name="defeitosConstatados"
-        placeholder="Descreva os defeitos constatados"
+        placeholder="Digite os defeitos constatados"
         title="Defeitos constatados">
        </textarea>
         </div>
@@ -258,7 +260,7 @@
           class="os-textarea-native"
           [(ngModel)]="causasProvaveis"
           name="causasProvaveis"
-          placeholder="Descreva as causas prováveis"
+          placeholder="Digite as causas prováveis"
           title="Causas prováveis">
       </textarea>
       </div>
@@ -269,7 +271,7 @@
            class="os-textarea-native"
            [(ngModel)]="observacoes"
            name="observacoes"
-           placeholder="Observações adicionais"
+            placeholder="Digite observações adicionais"
            title="Observações">
         </textarea>
       </div>
@@ -308,6 +310,7 @@
   expand="block"
   fill="outline"
   class="btn-anexar-foto"
+  [disabled]="!podeAnexarFoto"
   (click)="irParaNovaFoto()">
   ANEXAR FOTO
 </ion-button>
@@ -329,29 +332,31 @@
 
       <div class="os-foto-modal-card">
 
-        <!-- IMAGEM -->
-        <img
-          class="os-foto-modal-img"
-          [src]="fotoPreviewDataUrl"
-          alt="Foto da OS"
-        />
+        <div class="os-foto-frame">
+          <img
+            class="os-foto-modal-img"
+            [src]="fotoPreviewDataUrl"
+            alt="Foto da OS"
+          />
+        </div>
 
-        <!-- BOTÕES -->
-        <button
-          class="os-primary-btn"
-          type="button"
-          (click)="fecharFotoOverlay()"
-        >
-          FECHAR
-        </button>
+        <div class="os-foto-actions">
+          <button
+            class="os-modal-close-btn"
+            type="button"
+            (click)="fecharFotoOverlay()"
+          >
+            FECHAR
+          </button>
 
-        <button
-          class="os-secondary-btn"
-          type="button"
-          (click)="excluirFotoLocal()"
-        >
-          EXCLUIR FOTO
-        </button>
+          <button
+            class="os-modal-delete-btn"
+            type="button"
+            (click)="excluirFotoLocal()"
+          >
+            Excluir foto
+          </button>
+        </div>
 
       </div>
 
